@@ -26,9 +26,6 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
         </View> */}
       <View style = {styles.Main}>
-          <View>
-            
-          </View>
       </View>
       <View style = {styles.AddDelete}>
         <View style = {styles.buttonsLeft}>
