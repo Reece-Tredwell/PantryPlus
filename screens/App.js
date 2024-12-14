@@ -134,6 +134,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './home';
 import Add from './AddProduct';
 import Delete from './DeleteProduct';
+import AddScanner from './AddScanner';
 
 const Stack = createStackNavigator();
 
@@ -144,6 +145,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} options={{title: 'Pantry Plus', headerStyle: {backgroundColor: 'grey'}, headerTitleStyle:{fontSize: 35, fontFamily: 'arial'}}}/>
         <Stack.Screen name="Add" component={Add} options={{title: 'Add Products'}}/>
         <Stack.Screen name="Delete" component={Delete} options={{title: 'Delete Products'}} />
+        <Stack.Screen name="AddScanner" component={AddScanner} options={{title: "Scan Away!"}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
