@@ -3,7 +3,7 @@ import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 import React, { useState, useEffect, } from 'react';
 import { DataTable, TextInput } from 'react-native-paper';
 
-export default function CreatePantry() {
+export default function CreatePantry({ navigation}) {
   const [CreateModalVisible, setCreateModalVisible] = useState(false);
   const [LoginModalVisible, setLoginModalVisible] = useState(false);
   const [PantryUserName, UsernameSetText] = useState('');
@@ -16,6 +16,10 @@ export default function CreatePantry() {
   const openLoginModal = () => {
     setLoginModalVisible(true);
   }
+
+  const NavigateToHomePage = (DBID)  => {
+    navigation.navigate('Home', {"PantryID": DBID})
+  };
 
   const CreateNewPantryTable = async (username, password) => {
     console.log("Creating")
@@ -60,8 +64,11 @@ export default function CreatePantry() {
       console.log("Failed")
       console.log(response)
     }else{
+      console.log("Here")
       const data = await response.json();
       console.log(data);
+      setLoginModalVisible(false);
+      NavigateToHomePage(data["PantryKey"])
     }
   };
 

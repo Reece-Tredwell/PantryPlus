@@ -1,9 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, ImageBackground, Image, TouchableOpacity  } from 'react-native';
+import { StyleSheet,  View, Button, ImageBackground} from 'react-native';
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
   const image = { uri: "https://dkdesignkitchens.com.au/wp-content/uploads/7-Tips-For-Designing-The-Perfect-Walk-in-Pantry.jpg" };
   const profileImage = {uri : "https://thumbs.dreamstime.com/z/young-happy-positive-teenager-man-gesturing-ok-isolated-white-background-40784002.jpg"}
+  const {PantryID} = route.params
 
   const processProfilePress = () => {
     alert('Profile Clicked');
@@ -17,14 +18,13 @@ export default function HomeScreen({ navigation }) {
     navigation.navigate('Delete')
   };
 
+  const GetPantryItems = () => {
+
+  }
+
   
   return (
     <ImageBackground source={image} style={styles.image}>
-        {/* <View style={styles.rightSection}>
-        <TouchableOpacity onPress={processProfilePress}>
-          <Image source={profileImage} style={styles.profileImage}/>
-        </TouchableOpacity>
-        </View> */}
       <View style = {styles.Main}>
       </View>
       <View style = {styles.AddDelete}>
@@ -46,9 +46,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     height: '75%',
     width: '90%',
-    alignSelf: 'center', // Centers the box horizontally within the parent
-    justifyContent: 'center', // Ensures content inside the box is centered (if applicable)
-    marginTop: '-40%', // Adjusts vertical position
+    alignSelf: 'center', 
+    justifyContent: 'center', 
+    marginTop: '-40%', 
 
   },
 
@@ -88,30 +88,30 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 125,
-    flexDirection: 'row', // Arrange children horizontally
+    flexDirection: 'row', 
     alignItems: 'center',
-    justifyContent: 'space-between', // Space out children
+    justifyContent: 'space-between', 
     backgroundColor: '#969393',
-    paddingHorizontal: 10, // Add padding to edges
+    paddingHorizontal: 10,
   },
   rightSection: {
-    flex: 1, // Take equal space
+    flex: 1,
     justifyContent: 'center',
   },
   centerSection: {
-    flex: 2, // Take more space for the title
+    flex: 2, 
     alignItems: 'center',
     justifyContent: 'center',
   },
   leftSection: {
-    flex: 1, // Take equal space
-    alignItems: 'flex-end', // Align to the right
+    flex: 1, 
+    alignItems: 'flex-end', 
     justifyContent: 'center',
   },
   profileImage: {
-    width: 50, // Width of the profile image
-    height: 50, // Height of the profile image
-    borderRadius: 25, // Makes the image circular
+    width: 50, 
+    height: 50,
+    borderRadius: 25, 
   },
   text: {
     color: 'white',

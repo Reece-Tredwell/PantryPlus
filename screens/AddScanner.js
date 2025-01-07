@@ -37,7 +37,9 @@ export default function AddScanner() {
   const increment = () => setQuantity(prevQuantity => prevQuantity + 1);
   const decrement = () => setQuantity(prevQuantity => Math.max(0, prevQuantity - 1));
 
-
+  const insertItem = () =>{
+    setModalVisible(false)
+  }
 
   return (
     <View style={styles.page}>
@@ -89,7 +91,7 @@ export default function AddScanner() {
             </TouchableOpacity>
           </View>
           <View style={styles.ButtonRow}>
-            <TouchableOpacity style={styles.AddButton} onPress={() => setModalVisible(false)}>
+            <TouchableOpacity style={styles.AddButton} onPress={() => insertItem}>
               <Text style={styles.closeButtonText}> Add </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
