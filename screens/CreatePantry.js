@@ -35,7 +35,6 @@ export default function CreatePantry({ navigation}) {
       })
     })
     console.log(response)
-    console.log(config["PantryCreateAPIKey"])
     if (!response.ok) {
       console.log("Failed")
       console.log(response)

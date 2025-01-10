@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {View, Text, Modal, StyleSheet, TouchableOpacity  } from 'react-native';
 import { Image } from 'expo-image';
 import { DataTable } from 'react-native-paper';
+import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 
 export default function AddScanner() {
   const [data, setData] = useState(null);
@@ -37,9 +38,40 @@ export default function AddScanner() {
   const increment = () => setQuantity(prevQuantity => prevQuantity + 1);
   const decrement = () => setQuantity(prevQuantity => Math.max(0, prevQuantity - 1));
 
-  const insertItem = () =>{
+  const insertItem = async(productID, Image) =>{
+    try{
+      const response = await fetch(`https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/insertItem`, {
+        method: "POST",
+        headers: {
+          "accept":"application/json",
+          "Content-Type": "application/json",
+          "x-api-key": config["PantryCreateAPIKey"]
+        },
+        body: JSON.stringify({
+          "DBID":"p1",
+          "itemQuant": "1",
+              "itemData": {
+                  "insertID": "1",
+                  "productID": productID,
+                  "Image": Image,
+                  "userID": "1",
+                  "dateAdded": new Date().toLocaleDateString()
+              }
+          })
+      });
+      console.log(response)
+      if (!response.ok) {
+        console.log("Failed")
+        console.log(response)
+        throw new Error(`Failed To Add Data: ${response.status} ${response.statusText}`);
+      }
+    }catch{
+      console.log(response)
+      console.log("Failed To Insert Data Into Pantry")
+    }
     setModalVisible(false)
   }
+  
 
   return (
     <View style={styles.page}>
@@ -59,9 +91,6 @@ export default function AddScanner() {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
 
-              {/* <Text style={styles.modalText}>
-                {data?.product?.product_name || "Product not found"}
-              </Text> */}
           <DataTable style={styles.container}>
             <DataTable.Row>
               <DataTable.Cell style={styles.titleCell}>Product ID</DataTable.Cell>
@@ -91,7 +120,7 @@ export default function AddScanner() {
             </TouchableOpacity>
           </View>
           <View style={styles.ButtonRow}>
-            <TouchableOpacity style={styles.AddButton} onPress={() => insertItem}>
+            <TouchableOpacity style={styles.AddButton} onPress={() => insertItem(data.code, data.product.image_front_thumb_url)}>
               <Text style={styles.closeButtonText}> Add </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
