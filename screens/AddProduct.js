@@ -11,7 +11,7 @@ const NavigateToAddScanner = ()  => {
 
 
   return (
-      <View style={styles.page}>
+    <View style={styles.page}>
         <View>
           <Text style={styles.text}>This is Add</Text>
         </View>

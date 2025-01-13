@@ -5,6 +5,7 @@ import {View, Text, Modal, StyleSheet, TouchableOpacity  } from 'react-native';
 import { Image } from 'expo-image';
 import { DataTable } from 'react-native-paper';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function AddScanner() {
   const [data, setData] = useState(null);
@@ -34,12 +35,17 @@ export default function AddScanner() {
       });
     }
   };
-
+  
   const increment = () => setQuantity(prevQuantity => prevQuantity + 1);
   const decrement = () => setQuantity(prevQuantity => Math.max(0, prevQuantity - 1));
 
-  const insertItem = async(productID, Image) =>{
+  const insertItem = async(productID, Image, productName) =>{
+    console.log(productID)
+    console.log(Image)
+    console.log(productName)
     try{
+      // console.log("Here")
+      // console.log(data)
       const response = await fetch(`https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/insertItem`, {
         method: "POST",
         headers: {
@@ -48,11 +54,12 @@ export default function AddScanner() {
           "x-api-key": config["PantryCreateAPIKey"]
         },
         body: JSON.stringify({
-          "DBID":"p1",
-          "itemQuant": "1",
-              "itemData": {
+          "DBID": "p0",
+          "itemQuant": Quantity,
+          "itemData": {
                   "insertID": "1",
                   "productID": productID,
+                  "productName": productName,
                   "Image": Image,
                   "userID": "1",
                   "dateAdded": new Date().toLocaleDateString()
@@ -120,7 +127,7 @@ export default function AddScanner() {
             </TouchableOpacity>
           </View>
           <View style={styles.ButtonRow}>
-            <TouchableOpacity style={styles.AddButton} onPress={() => insertItem(data.code, data.product.image_front_thumb_url)}>
+            <TouchableOpacity style={styles.AddButton} onPress={() => insertItem(data.code, data.product.image_front_thumb_url, data.product.product_name)}>
               <Text style={styles.closeButtonText}> Add </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>

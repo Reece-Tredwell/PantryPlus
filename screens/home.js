@@ -1,14 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Button, ImageBackground } from 'react-native';
-import React, { useEffect } from 'react';
-import axios from 'axios';
+import { StyleSheet, View, Button, ImageBackground, FlatList, Text, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { useNavigationState, useFocusEffect } from '@react-navigation/native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 
 export default function HomeScreen({ navigation, route }) {
-  var data = [];
+  const navigationState = useNavigationState((state) => state);
+  const previousRoute = navigationState.routes[navigationState.routes.length - 2];
+  console.log('Coming from:', previousRoute?.name || 'None');
+  const [data, setData] = useState(null);
   const image = { uri: "https://dkdesignkitchens.com.au/wp-content/uploads/7-Tips-For-Designing-The-Perfect-Walk-in-Pantry.jpg" };
   const profileImage = { uri: "https://thumbs.dreamstime.com/z/young-happy-positive-teenager-man-gesturing-ok-isolated-white-background-40784002.jpg" }
   const { PantryID } = route.params
+
+  
 
   const processProfilePress = () => {
     alert('Profile Clicked');
@@ -21,6 +26,7 @@ export default function HomeScreen({ navigation, route }) {
   const NavigateToDeletePage = () => {
     navigation.navigate('Delete')
   };
+  
 
   const GetPantryItems = async (ID) => {
     try {
@@ -33,42 +39,104 @@ export default function HomeScreen({ navigation, route }) {
         },
         body: JSON.stringify({ "ID": ID })
       });
-      console.log(response.data)
       if (!response.ok) {
         console.log("Failed")
         throw new Error(`Failed to Get Data From Pantry: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
-      console.log("Pantry Items: ", data);
       return data;
     } catch {
       console.log("Cannot Retrieve Pantry Data")
     }
   }
 
-
+  const fetchPantryData = async () => {
+    var products = []
+    try {
+      const data = await GetPantryItems("p0");
+      const pantryData = data
+      for(var i = 0; i < pantryData.length; i++){
+        products.push({
+          insertID: pantryData[i][0],
+          productID: pantryData[i][1],
+          productName: pantryData[i][2],
+          image: pantryData[i][4],
+          dateAdded: pantryData[i][5]
+        });
+      }
+      setData(products)
+    } catch (error) {
+      console.error("Error fetching pantry data:", error);
+    }
+  };
 
   useEffect(() => {
-    console.log('HomeScreen loaded');
-    data = GetPantryItems("p1");
-    var pantryData = data[0];
-    for (let i = 0; i < pantryData.length; i++) {
-      updatedData.push({
-        insertID: pantryData[i].insertID,
-        productID: pantryData[i].productID,
-        userID: pantryData[i].userID,
-        image: pantryData[i].Image,
-        dateAdded: pantryData[i].dateAdded
-      });
-    }
+    fetchPantryData();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchPantryData(); 
+    }, [])
+  );
+
+
+  const renderRow = ({ item }) => {
+    const keys = Object.keys(item);
+    return (
+      <View style={styles.row}>
+        {keys.map((key) => {
+          if (key === "image") {
+            return (
+              <Image
+                key={key}
+                source={{ uri: item[key] }}
+                style={styles.image}
+              />
+            );
+          }
+          return (
+            <Text key={key} style={styles.cell}>
+              {item[key]}
+            </Text>
+          );
+        })}
+      </View>
+    );
+  };
+
+  const renderHeader = () => {
+    const keys = Object.keys(data[0] || {});
+    return (
+      <View style={styles.row}>
+        {keys.map((key) => (
+          <Text key={key} style={[styles.cell, styles.headerCell]}>
+            {key.charAt(0).toUpperCase() + key.slice(1)} {}
+          </Text>
+        ))}
+      </View>
+    );
+  };
 
   return (
     <ImageBackground source={image} style={styles.image}>
+      <View style={styles.tableHeader}>
+            <FlatList
+            style={styles.headerCell}
+            data={data}
+            renderItem={renderHeader}
+            keyExtractor={(item, index) => index.toString()}
+          />
+          </View>
       <View style={styles.Main}>
-      </View>
-      <View style={styles.AddDelete}>
+          <FlatList
+            style={styles.cell}
+            data={data}
+            renderItem={renderRow}
+            keyExtractor={(item, index) => index.toString()}
+          />
+    </View>
+    <View style={styles.AddDelete}>
         <View style={styles.buttonsLeft}>
           <Button title="Add" style={styles.button} onPress={NavigateToAddPage} />
         </View>
@@ -83,13 +151,47 @@ export default function HomeScreen({ navigation, route }) {
 
 
 const styles = StyleSheet.create({
-  Main: {
+  headerCell:{
+    fontSize: 10,
+    fontWeight: "bold2"
+  },
+
+  tableHeader: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    alignSelf: 'center',
+    borderBottomColor: "#ccc",
+    paddingVertical: 8,
+    marginTop: "10%",
     backgroundColor: 'white',
-    height: '75%',
-    width: '90%',
+    height: '10%',
+    width: '97%',
+    
+    
+  },
+  row: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    paddingVertical: 8,
+    marginTop: 10,
+  },
+
+  cell: {
+    fontSize: 11,
+    flex: 1,
+    textAlign: "center",
+    paddingHorizontal: 8,
+  },
+
+  Main: {
+    flexDirection: "row",
+    backgroundColor: 'white',
+    height: '60%',
+    width: '97%',
     alignSelf: 'center',
     justifyContent: 'center',
-    marginTop: '-40%',
+    marginBottom: '50%',
 
   },
 

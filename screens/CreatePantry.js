@@ -63,9 +63,7 @@ export default function CreatePantry({ navigation}) {
       console.log("Failed")
       console.log(response)
     }else{
-      console.log("Here")
       const data = await response.json();
-      console.log(data);
       setLoginModalVisible(false);
       NavigateToHomePage(data["PantryKey"])
     }
