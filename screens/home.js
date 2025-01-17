@@ -4,29 +4,26 @@ import React, { useState, useEffect } from 'react';
 import { useNavigationState, useFocusEffect } from '@react-navigation/native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 
+
 export default function HomeScreen({ navigation, route }) {
-  const navigationState = useNavigationState((state) => state);
-  const previousRoute = navigationState.routes[navigationState.routes.length - 2];
-  console.log('Coming from:', previousRoute?.name || 'None');
   const [data, setData] = useState(null);
   const image = { uri: "https://dkdesignkitchens.com.au/wp-content/uploads/7-Tips-For-Designing-The-Perfect-Walk-in-Pantry.jpg" };
-  const profileImage = { uri: "https://thumbs.dreamstime.com/z/young-happy-positive-teenager-man-gesturing-ok-isolated-white-background-40784002.jpg" }
   const { PantryID } = route.params
+  const headers = ["Insert ID", "Product ID", "Product Name", "Image", "Date"];
 
-  
 
-  const processProfilePress = () => {
-    alert('Profile Clicked');
-  };
+  // const processProfilePress = () => {
+  //   alert('Profile Clicked');
+  // };
 
   const NavigateToAddPage = () => {
-    navigation.navigate('Add')
+    navigation.navigate('Add', {"PantryID": PantryID})
   };
 
   const NavigateToDeletePage = () => {
-    navigation.navigate('Delete')
+    navigation.navigate('Delete', { data: data });
   };
-  
+
 
   const GetPantryItems = async (ID) => {
     try {
@@ -46,16 +43,16 @@ export default function HomeScreen({ navigation, route }) {
       const data = await response.json();
       return data;
     } catch {
+      alert("Cannot Retrieve Pantry Data")
       console.log("Cannot Retrieve Pantry Data")
     }
   }
 
   const fetchPantryData = async () => {
-    var products = []
     try {
-      const data = await GetPantryItems("p0");
-      const pantryData = data
-      for(var i = 0; i < pantryData.length; i++){
+      var products = []
+      const pantryData = await GetPantryItems(PantryID);
+      for (var i = 0; i < pantryData.length; i++) {
         products.push({
           insertID: pantryData[i][0],
           productID: pantryData[i][1],
@@ -70,13 +67,13 @@ export default function HomeScreen({ navigation, route }) {
     }
   };
 
+
   useEffect(() => {
-    fetchPantryData();
-  }, []);
+  }, [data]);
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchPantryData(); 
+      fetchPantryData();
     }, [])
   );
 
@@ -105,38 +102,25 @@ export default function HomeScreen({ navigation, route }) {
     );
   };
 
-  const renderHeader = () => {
-    const keys = Object.keys(data[0] || {});
-    return (
-      <View style={styles.row}>
-        {keys.map((key) => (
-          <Text key={key} style={[styles.cell, styles.headerCell]}>
-            {key.charAt(0).toUpperCase() + key.slice(1)} {}
-          </Text>
-        ))}
-      </View>
-    );
-  };
 
   return (
     <ImageBackground source={image} style={styles.image}>
       <View style={styles.tableHeader}>
-            <FlatList
-            style={styles.headerCell}
-            data={data}
-            renderItem={renderHeader}
-            keyExtractor={(item, index) => index.toString()}
-          />
-          </View>
+        {headers.map((header, index) => (
+          <Text key={index} style={styles.headerCell}>
+            {header}
+          </Text>
+        ))}
+      </View>
       <View style={styles.Main}>
-          <FlatList
-            style={styles.cell}
-            data={data}
-            renderItem={renderRow}
-            keyExtractor={(item, index) => index.toString()}
-          />
-    </View>
-    <View style={styles.AddDelete}>
+        <FlatList
+          style={styles.cell}
+          data={data}
+          renderItem={renderRow}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+      <View style={styles.AddDelete}>
         <View style={styles.buttonsLeft}>
           <Button title="Add" style={styles.button} onPress={NavigateToAddPage} />
         </View>
@@ -151,23 +135,22 @@ export default function HomeScreen({ navigation, route }) {
 
 
 const styles = StyleSheet.create({
-  headerCell:{
-    fontSize: 10,
-    fontWeight: "bold2"
-  },
-
   tableHeader: {
     flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#f0f0f0",
+    padding: 10,
     borderBottomWidth: 1,
-    alignSelf: 'center',
     borderBottomColor: "#ccc",
-    paddingVertical: 8,
-    marginTop: "10%",
-    backgroundColor: 'white',
-    height: '10%',
-    width: '97%',
-    
-    
+    width: "97%",
+    alignSelf: 'center',
+  },
+  headerCell: {
+    flex: 1,
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#333",
   },
   row: {
     flexDirection: "row",

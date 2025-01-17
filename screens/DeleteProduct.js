@@ -1,10 +1,37 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ViewBase, Button } from 'react-native';
+import { useCameraPermissions } from 'expo-camera';
 
-export default function Delete() {
+export default function Delete({ navigation, route }) {
+  const [permission, requestPermission] = useCameraPermissions();
+  const { data } = route.params
+  const [Data, setData] = useState(false);
+
+
+  useEffect(() => {
+    setData(data)
+  }, [data]);
+
+  const NavigateToDeleteScanner = () => {
+    navigation.navigate('ScanDelete')
+  };
+
+  const NavigateToSelectDelete = () => {
+    navigation.navigate('SelectDelete',{ data: data })
+  };
+
+
   return (
     <View style={styles.page}>
-      <Text style={styles.text}>This is Delete</Text>
+      <View>
+        <Text style={styles.text}>This is the Delete Page</Text>
+      </View>
+      <View style={styles.buttonView}>
+        <Button title="Request Permission" style={styles.button} onPress={requestPermission} />
+        <Button title="Scan Barcode" style={styles.button} onPress={NavigateToDeleteScanner} />
+        <Button title="Select Items To Delete" style={styles.button} onPress={NavigateToSelectDelete} />
+        <Button title="Enter Barcode Number" style={styles.button} />
+      </View>
     </View>
   );
 }
@@ -19,5 +46,17 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 24,
     fontWeight: 'bold',
+  },
+
+  button: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  buttonView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

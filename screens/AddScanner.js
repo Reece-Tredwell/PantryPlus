@@ -5,9 +5,11 @@ import {View, Text, Modal, StyleSheet, TouchableOpacity  } from 'react-native';
 import { Image } from 'expo-image';
 import { DataTable } from 'react-native-paper';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
-import { useFocusEffect } from '@react-navigation/native';
+import { useNavigationState, useFocusEffect } from '@react-navigation/native';
 
-export default function AddScanner() {
+
+export default function AddScanner({route}) {
+  const { PantryID } = route.params
   const [data, setData] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -40,9 +42,7 @@ export default function AddScanner() {
   const decrement = () => setQuantity(prevQuantity => Math.max(0, prevQuantity - 1));
 
   const insertItem = async(productID, Image, productName) =>{
-    console.log(productID)
-    console.log(Image)
-    console.log(productName)
+    console.log(new Date());
     try{
       // console.log("Here")
       // console.log(data)
@@ -54,7 +54,7 @@ export default function AddScanner() {
           "x-api-key": config["PantryCreateAPIKey"]
         },
         body: JSON.stringify({
-          "DBID": "p0",
+          "DBID": PantryID,
           "itemQuant": Quantity,
           "itemData": {
                   "insertID": "1",
@@ -62,7 +62,7 @@ export default function AddScanner() {
                   "productName": productName,
                   "Image": Image,
                   "userID": "1",
-                  "dateAdded": new Date().toLocaleDateString()
+                  "dateAdded": new Date()
               }
           })
       });
