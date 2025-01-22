@@ -42,10 +42,7 @@ export default function AddScanner({route}) {
   const decrement = () => setQuantity(prevQuantity => Math.max(0, prevQuantity - 1));
 
   const insertItem = async(productID, Image, productName) =>{
-    console.log(new Date());
     try{
-      // console.log("Here")
-      // console.log(data)
       const response = await fetch(`https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/insertItem`, {
         method: "POST",
         headers: {
@@ -57,7 +54,6 @@ export default function AddScanner({route}) {
           "DBID": PantryID,
           "itemQuant": Quantity,
           "itemData": {
-                  "insertID": "1",
                   "productID": productID,
                   "productName": productName,
                   "Image": Image,

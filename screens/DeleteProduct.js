@@ -5,6 +5,7 @@ import { useCameraPermissions } from 'expo-camera';
 export default function Delete({ navigation, route }) {
   const [permission, requestPermission] = useCameraPermissions();
   const { data } = route.params
+  const { PantryID } = route.params
   const [Data, setData] = useState(false);
 
 
@@ -13,7 +14,8 @@ export default function Delete({ navigation, route }) {
   }, [data]);
 
   const NavigateToDeleteScanner = () => {
-    navigation.navigate('ScanDelete')
+    console.log(PantryID)
+    navigation.navigate('ScanDelete', {"PantryID": PantryID})
   };
 
   const NavigateToSelectDelete = () => {

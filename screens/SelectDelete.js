@@ -62,12 +62,6 @@ export default function SelectDelete({ navigation, route }) {
         ))}
       </View>
       <View style={styles.Main}>
-        {/* <Checkbox
-          onValueChange={setChecked}
-          value={isChecked}
-          style={styles.checkbox}
-          color={isChecked ? '#4630EB' : undefined}
-        /> */}
         <FlatList
           style={styles.cell}
           data={data}

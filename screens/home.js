@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Button, ImageBackground, FlatList, Text, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { useNavigationState, useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect } from '@react-navigation/native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 
 
@@ -11,19 +11,14 @@ export default function HomeScreen({ navigation, route }) {
   const { PantryID } = route.params
   const headers = ["Insert ID", "Product ID", "Product Name", "Image", "Date"];
 
-
-  // const processProfilePress = () => {
-  //   alert('Profile Clicked');
-  // };
-
   const NavigateToAddPage = () => {
     navigation.navigate('Add', {"PantryID": PantryID})
   };
 
   const NavigateToDeletePage = () => {
-    navigation.navigate('Delete', { data: data });
+    console.log(PantryID)
+    navigation.navigate('Delete', { "PantryID": PantryID });
   };
-
 
   const GetPantryItems = async (ID) => {
     try {
@@ -52,7 +47,7 @@ export default function HomeScreen({ navigation, route }) {
     try {
       var products = []
       const pantryData = await GetPantryItems(PantryID);
-      for (var i = 0; i < pantryData.length; i++) {
+      for (var i = 0; i < pantryData.length;  i++) {
         products.push({
           insertID: pantryData[i][0],
           productID: pantryData[i][1],

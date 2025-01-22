@@ -7,39 +7,60 @@ import { DataTable } from 'react-native-paper';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 import { useFocusEffect } from '@react-navigation/native';
 
-export default function AddScanner() {
+export default function AddScanner({ route }) {
+    const {PantryID} = route.params
     const [data, setData] = useState(null);
     const [scanned, setScanned] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [Quantity, setQuantity] = useState(0);
+    const [barcode, setbarcode] = useState(0);
 
-    // const fetchData = async (barcode) => {
-    //     try {
-    //         const response = await axios.get(
-    //             `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
-    //         );
-    //         setData(response.data);
-    //         console.log("Fetched data:", response.data);
-    //         setModalVisible(true);
-    //     } catch (error) {
-    //         console.error("Error fetching data:", error);
-    //     }
-    // };
-
-    const handleBarcodeScanned = ({ data: barcode }) => {
-        //Got the Barcode, send it to the lambda //
-        
-        // if (!scanned) {
-        //     setScanned(true);
-        //     console.log("Barcode Number Read: " + barcode);
-        //     fetchData(barcode).finally(() => {
-        //         setTimeout(() => setScanned(false), 3000);
-        //     });
-        // }
+    const fetchData = async (barcode) => {
+        try {
+            const response = await axios.get(
+                `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+            );
+            setData(response.data);
+            console.log("Fetched data:", response.data);
+            setModalVisible(true);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
     };
 
+    const handleBarcodeScanned = ({ data: barcode }) => {
+        setbarcode(barcode)
+        if (!scanned) {
+            setScanned(true);
+            console.log("Barcode Number Read: " + barcode);
+            fetchData(barcode).finally(() => {
+                setTimeout(() => setScanned(false), 3000);
+            });
+        }
+    };
 
-
+    const removeItem = async (productBarcode, PantryID) => {
+        console.log("Here")
+        console.log("code:", productBarcode)
+        console.log("ID:", PantryID)
+        try {
+            const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/deleteDataFromPantry", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": config["PantryCreateAPIKey"]
+                },
+                body: JSON.stringify({
+                    "barcode": productBarcode,
+                    "pantryID": PantryID
+                })
+            }
+            )
+            console.log(response)
+        } catch (error) {
+            console.error("error found: ", error)
+        }
+    }
 
     return (
         <View style={styles.page}>
@@ -58,7 +79,9 @@ export default function AddScanner() {
                 >
                     <View style={styles.modalOverlay}>
                         <View style={styles.modalContent}>
-
+                            <Text style={styles.ModalHeader}>
+                                Remove From Pantry
+                            </Text>
                             <DataTable style={styles.container}>
                                 <DataTable.Row>
                                     <DataTable.Cell style={styles.titleCell}>Product ID</DataTable.Cell>
@@ -77,22 +100,12 @@ export default function AddScanner() {
                                 source={{ uri: data.product.image_front_thumb_url }}
                                 style={{ width: 100, height: 100 }}
                             />
-                            <Text style={styles.QuantTitle}>Quantity</Text>
-                            <View style={styles.Counter}>
-                                <TouchableOpacity style={styles.DecButton} onPress={decrement}>
-                                    <Text style={styles.closeButtonText}>-</Text>
-                                </TouchableOpacity>
-                                <Text style={styles.number}>{Quantity}</Text>
-                                <TouchableOpacity style={styles.IncButton} onPress={increment}>
-                                    <Text style={styles.closeButtonText}>+</Text>
-                                </TouchableOpacity>
-                            </View>
                             <View style={styles.ButtonRow}>
-                                <TouchableOpacity style={styles.AddButton} onPress={() => insertItem(data.code, data.product.image_front_thumb_url, data.product.product_name)}>
-                                    <Text style={styles.closeButtonText}> Add </Text>
+                                <TouchableOpacity style={styles.AddButton} onPress={() => setModalVisible(false)}>
+                                    <Text style={styles.closeButtonText}> Close </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-                                    <Text style={styles.closeButtonText}>Close</Text>
+                                <TouchableOpacity style={styles.closeButton} onPress={() => removeItem(barcode, PantryID)}>
+                                    <Text style={styles.closeButtonText}>Remove</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -104,14 +117,16 @@ export default function AddScanner() {
 }
 
 const styles = StyleSheet.create({
-    ButtonRow: {
-        top: 10,
-        flexDirection: 'row',
-    },
-    QuantTitle: {
-        top: 10,
+    ModalHeader: {
+        alignSelf: 'center',
         fontWeight: 'bold',
-        fontSize: 15
+        fontSize: '25'
+    },
+    ButtonRow: {
+        alignItems: 'center',
+        alignSelf: 'center',
+        top: 50,
+        flexDirection: 'row',
     },
     number: {
         top: 15,

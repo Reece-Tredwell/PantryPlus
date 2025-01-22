@@ -25,7 +25,7 @@ except psycopg2.Error as e:
 
 def getDBID():
     s3 = boto3.client('s3')
-    DBID = s3.get_object(Bucket="pantrys", Key="CurrentPantryID.json")
+    DBID = s3.get_object(Bucket="####", Key="#####.json")
     # DBID = json.loads(DBID['Body'].read())
     print(DBID)
     #this is for Getting the PantryID
