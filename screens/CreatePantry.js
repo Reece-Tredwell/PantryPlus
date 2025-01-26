@@ -1,9 +1,11 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
-import React, {useState} from 'react';
-import { DataTable, TextInput } from 'react-native-paper';
+import React, { useState } from 'react';
+import { DataTable } from 'react-native-paper';
 
 export default function CreatePantry({ navigation }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [secureText, setSecureText] = useState(true);
   const [CreateModalVisible, setCreateModalVisible] = useState(false);
   const [LoginModalVisible, setLoginModalVisible] = useState(false);
   const [PantryUserName, UsernameSetText] = useState('');
@@ -21,6 +23,13 @@ export default function CreatePantry({ navigation }) {
     navigation.navigate('Home', { "PantryID": DBID })
   };
 
+  const renderLoading = () => {
+    return (
+      <View>
+        <ActivityIndicator size="large" />
+      </View>
+    )
+  }
   const CreateNewPantryTable = async (username, password) => {
     const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/CreateNewPantryTable", {
       method: "POST",
@@ -41,11 +50,15 @@ export default function CreatePantry({ navigation }) {
     }
     const data = await response.json();
     console.log(data);
+    setCreateModalVisible(false);
+    LoginToPantry(username, password)
   };
 
 
   const LoginToPantry = async (username, password) => {
     console.log("Logging In")
+    setIsLoading(true);
+    renderLoading()
     const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/LoginToPantry", {
       method: "POST",
       headers: {
@@ -60,6 +73,7 @@ export default function CreatePantry({ navigation }) {
 
     if (!response.ok) {
       console.log("Failed")
+      alert("Incorrect Credentials")
       console.log(response)
     } else {
       const data = await response.json();
@@ -70,81 +84,88 @@ export default function CreatePantry({ navigation }) {
 
 
   return (
-    <View style={styles.buttonView}>
-      <TouchableOpacity style={styles.CreatePantryButton} onPress={openCreateModal}>
-        <Text style={styles.Text}>New Pantry</Text>
-      </TouchableOpacity>
+    <View style={styles.background}>
+      <View style={styles.buttonView}>
+        <TouchableOpacity style={styles.CreatePantryButton} onPress={openCreateModal}>
+          <Text style={styles.Text}>New Pantry</Text>
+        </TouchableOpacity>
 
 
-      <TouchableOpacity style={styles.CreatePantryButton} onPress={openLoginModal}>
-        <Text style={styles.Text}>Sign In</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.CreatePantryButton} onPress={openLoginModal}>
+          <Text style={styles.Text}>Sign In</Text>
+        </TouchableOpacity>
 
-      {CreateModalVisible && (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={CreateModalVisible}
-          onRequestClose={() => setCreateModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+        {CreateModalVisible && (
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={CreateModalVisible}
+            onRequestClose={() => setCreateModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
 
-              <DataTable style={styles.container}>
-                <DataTable.Row>
-                  <TextInput style={styles.TextInput} placeholder='Pantry Name' value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
-                </DataTable.Row>
-                <DataTable.Row>
-                  <TextInput style={styles.TextInput} placeholder='Password' value={Password} onChangeText={PasswordSetText}></TextInput>
-                </DataTable.Row>
-              </DataTable>
-              <View style={styles.ButtonRow}>
-                <TouchableOpacity style={styles.CreateButton} onPress={() => setCreateModalVisible(false)}>
-                  <Text style={styles.closeButtonText}> Close </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.closeButton} onPress={() => CreateNewPantryTable(PantryUserName, Password)}>
-                  <Text style={styles.closeButtonText}>Create</Text>
-                </TouchableOpacity>
+                <DataTable style={styles.container}>
+                  <DataTable.Row>
+                    <TextInput style={styles.TextInput} placeholder='Pantry Name' value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
+                  </DataTable.Row>
+                  <DataTable.Row>
+                    <TextInput style={styles.TextInput} placeholder='Password' value={Password} onChangeText={PasswordSetText} secureTextEntry={false} ></TextInput>
+                  </DataTable.Row>
+                </DataTable>
+                <View style={styles.ButtonRow}>
+                  <TouchableOpacity style={styles.CreateButton} onPress={() => setCreateModalVisible(false)}>
+                    <Text style={styles.closeButtonText}> Close </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => CreateNewPantryTable(PantryUserName, Password)}>
+                    <Text style={styles.closeButtonText}>Create</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        </Modal>
-      )}
+          </Modal>
+        )}
 
-      {LoginModalVisible && (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={LoginModalVisible}
-          onRequestClose={() => setLoginModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+        {LoginModalVisible && (
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={LoginModalVisible}
+            onRequestClose={() => setLoginModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
 
-              <DataTable style={styles.container}>
-                <DataTable.Row>
-                  <TextInput style={styles.TextInput} placeholder='Pantry Name' value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
-                </DataTable.Row>
-                <DataTable.Row>
-                  <TextInput style={styles.TextInput} placeholder='Password' value={Password} onChangeText={PasswordSetText}></TextInput>
-                </DataTable.Row>
-              </DataTable>
-              <View style={styles.ButtonRow}>
-                <TouchableOpacity style={styles.CreateButton} onPress={() => setLoginModalVisible(false)}>
-                  <Text style={styles.closeButtonText}> Close </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.closeButton} onPress={() => LoginToPantry(PantryUserName, Password)}>
-                  <Text style={styles.closeButtonText}>Login</Text>
-                </TouchableOpacity>
+                <DataTable style={styles.container}>
+                  <DataTable.Row>
+                    <TextInput style={styles.TextInput} placeholder='Pantry Name' value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
+                  </DataTable.Row>
+                  <DataTable.Row>
+                    <TextInput style={styles.TextInput} placeholder='Password' value={Password} onChangeText={PasswordSetText}></TextInput>
+                  </DataTable.Row>
+                </DataTable>
+                <View style={styles.ButtonRow}>
+                  <TouchableOpacity style={styles.CreateButton} onPress={() => setLoginModalVisible(false)}>
+                    <Text style={styles.closeButtonText}> Close </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => LoginToPantry(PantryUserName, Password)}>
+                    <Text style={styles.closeButtonText}>Login</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        </Modal>
-      )}
+          </Modal>
+        )}
+      </View>
     </View>
   );
 }
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: '#123524',
+    height: '100%',
+    width: '100%'
+  },
   TextInput: {
     opacity: 10,
     flex: 1,
@@ -161,15 +182,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   CreatePantryButton: {
-    alignContent:'center',
+    alignContent: 'center',
     justifyContent: 'center',
     textAlign: 'center',
     width: '45%',
-    height:'20%',
+    height: '20%',
     flex: 0,
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#85A947',
     borderRadius: 5,
   },
   Text: {
@@ -177,7 +198,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
     marginBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: '#EFE3C2'
   },
   closeButton: {
     marginTop: 10,
@@ -204,8 +226,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: 300,
-    height: 500,
+    width: '85%',
+    height: '25%',
     padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
