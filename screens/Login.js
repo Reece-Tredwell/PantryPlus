@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ActivityIndicator, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ActivityIndicator, Keyboard } from 'react-native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 import React, { useState } from 'react';
 import { Button, DataTable, Title } from 'react-native-paper';
@@ -7,63 +7,27 @@ import { navigate } from 'expo-router/build/global-state/routing';
 
 export default function CreatePantry({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
-    const [secureText, setSecureText] = useState(true);
-    const [CreateModalVisible, setCreateModalVisible] = useState(false);
-    const [LoginModalVisible, setLoginModalVisible] = useState(false);
     const [PantryUserName, UsernameSetText] = useState('');
     const [Password, PasswordSetText] = useState('');
 
-    const openCreateModal = () => {
-        setCreateModalVisible(true);
-    }
+
+    const ForgotPassword = () => {
+        //TODO
+    };
 
     const navigateToCreatePantry = () => {
         navigation.navigate('CreatePantry')
-    }
-
-    const openLoginModal = () => {
-        setLoginModalVisible(true);
     }
 
     const NavigateToHomePage = (DBID) => {
         navigation.navigate('Home', { "PantryID": DBID })
     };
 
-    const renderLoading = () => {
-        return (
-            <View>
-                <ActivityIndicator size="large" />
-            </View>
-        )
-    }
-    const CreateNewPantryTable = async (username, password) => {
-        const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/CreateNewPantryTable", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": config["PantryCreateAPIKey"]
-            },
-            body: JSON.stringify({
-                "username": username,
-                "password": password
-            })
-        })
-        console.log(response)
-        if (!response.ok) {
-            console.log("Failed")
-            console.log(response)
-            throw new Error(`Failed to create pantry table: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log(data);
-        setCreateModalVisible(false);
-        LoginToPantry(username, password)
-    };
 
     const LoginToPantry = async (username, password) => {
         console.log("Logging In")
         setIsLoading(true);
-        renderLoading()
+        Keyboard.dismiss();
         const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/LoginToPantry", {
             method: "POST",
             headers: {
@@ -101,11 +65,16 @@ export default function CreatePantry({ navigation }) {
                 <View style={styles.PasswordInput}>
                     <TextInput style={styles.textInput} placeholder='Password' placeholderTextColor="#EFE3C2" value={Password} onChangeText={PasswordSetText}></TextInput>
                 </View>
-                <TouchableOpacity style={styles.LoginButtonBox} onPress={() => LoginToPantry(PantryUserName, Password)}>
-                    <Text style={styles.LoginText}>Login</Text>
-                </TouchableOpacity>
+                <Button title="Forgot Password?" style={styles.ForgotPasswordText} onPress={() => ForgotPassword()}>Forgot Password?</Button>
+                {isLoading ? (
+                    <ActivityIndicator size="large" color="#85A947" />
+                ) : (
+                    <TouchableOpacity style={styles.LoginButtonBox} onPress={() => LoginToPantry(PantryUserName, Password)}>
+                        <Text style={styles.LoginText}>Login</Text>
+                    </TouchableOpacity>
+                )}
             </View>
-            <Button  title="New Pantry" style={styles.newPantryText} onPress={() => navigateToCreatePantry()}>New Pantry</Button>
+            <Button title="New Pantry" style={styles.newPantryText} onPress={() => navigateToCreatePantry()}>New Pantry</Button>
         </View>
     );
 };
@@ -171,7 +140,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     LoginButtonBox: {
-        top: '50%',
+        top: '30%',
         height: '40%',
         width: "90%",
         backgroundColor: '#EFE3C2',
@@ -195,8 +164,12 @@ const styles = StyleSheet.create({
         color: '#EFE3C2',
     },
     newPantryText: {
-        bottom: '33%',
-        fontSize:14,
+        bottom: '34%',
+        fontSize: 14,
+    },
+    ForgotPasswordText: {
+        top: 5,
+        fontSize: 14,
     }
 
 })

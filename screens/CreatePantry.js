@@ -1,7 +1,9 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ActivityIndicator, Keyboard } from 'react-native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 import React, { useState } from 'react';
-import { DataTable } from 'react-native-paper';
+import { Button, DataTable, Title } from 'react-native-paper';
+import { navigate } from 'expo-router/build/global-state/routing';
+
 
 export default function CreatePantry({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,27 +12,45 @@ export default function CreatePantry({ navigation }) {
   const [LoginModalVisible, setLoginModalVisible] = useState(false);
   const [PantryUserName, UsernameSetText] = useState('');
   const [Password, PasswordSetText] = useState('');
+  const [EmailSetText, setEmail] = useState('');
 
-  const openCreateModal = () => {
-    setCreateModalVisible(true);
-  }
-
-  const openLoginModal = () => {
-    setLoginModalVisible(true);
-  }
 
   const NavigateToHomePage = (DBID) => {
     navigation.navigate('Home', { "PantryID": DBID })
   };
 
-  const renderLoading = () => {
-    return (
-      <View>
-        <ActivityIndicator size="large" />
-      </View>
-    )
-  }
-  const CreateNewPantryTable = async (username, password) => {
+  const NavigateToLogin = () => {
+    navigation.navigate('Login')
+  };
+
+  const LoginToPantry = async (username, password) => {
+    console.log("Logging In")
+    setIsLoading(true);
+    Keyboard.dismiss();
+    const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/LoginToPantry", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": config["PantryCreateAPIKey"]
+        },
+        body: JSON.stringify({
+            "username": username,
+            "password": password
+        })
+    });
+
+    if (!response.ok) {
+        console.log("Failed")
+        alert("Incorrect Credentials")
+        console.log(response)
+    } else {
+        const data = await response.json();
+        setLoginModalVisible(false);
+        NavigateToHomePage(data["PantryKey"])
+    }
+};
+
+  const CreateNewPantryTable = async (email, username, password) => {
     const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/CreateNewPantryTable", {
       method: "POST",
       headers: {
@@ -38,6 +58,7 @@ export default function CreatePantry({ navigation }) {
         "x-api-key": config["PantryCreateAPIKey"]
       },
       body: JSON.stringify({
+        "email": email,
         "username": username,
         "password": password
       })
@@ -55,183 +76,139 @@ export default function CreatePantry({ navigation }) {
   };
 
 
-  const LoginToPantry = async (username, password) => {
-    console.log("Logging In")
-    setIsLoading(true);
-    renderLoading()
-    const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/LoginToPantry", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": config["PantryCreateAPIKey"]
-      },
-      body: JSON.stringify({
-        "username": username,
-        "password": password
-      })
-    });
-
-    if (!response.ok) {
-      console.log("Failed")
-      alert("Incorrect Credentials")
-      console.log(response)
-    } else {
-      const data = await response.json();
-      setLoginModalVisible(false);
-      NavigateToHomePage(data["PantryKey"])
-    }
-  };
-
-
   return (
-    <View style={styles.background}>
-      <View style={styles.buttonView}>
-        <TouchableOpacity style={styles.CreatePantryButton} onPress={openCreateModal}>
-          <Text style={styles.Text}>New Pantry</Text>
-        </TouchableOpacity>
-
-
-        <TouchableOpacity style={styles.CreatePantryButton} onPress={openLoginModal}>
-          <Text style={styles.Text}>Sign In</Text>
-        </TouchableOpacity>
-
-        {CreateModalVisible && (
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={CreateModalVisible}
-            onRequestClose={() => setCreateModalVisible(false)}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContent}>
-
-                <DataTable style={styles.container}>
-                  <DataTable.Row>
-                    <TextInput style={styles.TextInput} placeholder='Pantry Name' value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
-                  </DataTable.Row>
-                  <DataTable.Row>
-                    <TextInput style={styles.TextInput} placeholder='Password' value={Password} onChangeText={PasswordSetText} secureTextEntry={false} ></TextInput>
-                  </DataTable.Row>
-                </DataTable>
-                <View style={styles.ButtonRow}>
-                  <TouchableOpacity style={styles.CreateButton} onPress={() => setCreateModalVisible(false)}>
-                    <Text style={styles.closeButtonText}> Close </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.closeButton} onPress={() => CreateNewPantryTable(PantryUserName, Password)}>
-                    <Text style={styles.closeButtonText}>Create</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </Modal>
-        )}
-
-        {LoginModalVisible && (
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={LoginModalVisible}
-            onRequestClose={() => setLoginModalVisible(false)}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContent}>
-
-                <DataTable style={styles.container}>
-                  <DataTable.Row>
-                    <TextInput style={styles.TextInput} placeholder='Pantry Name' value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
-                  </DataTable.Row>
-                  <DataTable.Row>
-                    <TextInput style={styles.TextInput} placeholder='Password' value={Password} onChangeText={PasswordSetText}></TextInput>
-                  </DataTable.Row>
-                </DataTable>
-                <View style={styles.ButtonRow}>
-                  <TouchableOpacity style={styles.CreateButton} onPress={() => setLoginModalVisible(false)}>
-                    <Text style={styles.closeButtonText}> Close </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.closeButton} onPress={() => LoginToPantry(PantryUserName, Password)}>
-                    <Text style={styles.closeButtonText}>Login</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </Modal>
+    <View style={styles.pageBackground}>
+      <View style={styles.titleBox}>
+        <Text style={styles.title}>Pantry Plus</Text>
+        <Text style={styles.subtitle}>Create Pantry</Text>
+      </View>
+      <View style={styles.RegisterBox}>
+        <View style={styles.EmailInput}>
+          <TextInput style={styles.textInput} placeholder='Email' placeholderTextColor="#EFE3C2" value={EmailSetText} onChangeText={setEmail}></TextInput>
+        </View>
+        <View style={styles.PantryNameInput}>
+          <TextInput style={styles.textInput} placeholder='PantryName' placeholderTextColor="#EFE3C2" value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
+        </View>
+        <View style={styles.PasswordInput}>
+          <TextInput style={styles.textInput} placeholder='Password' placeholderTextColor="#EFE3C2" value={Password} onChangeText={PasswordSetText}></TextInput>
+        </View>
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#85A947" />
+        ) : (
+          <TouchableOpacity style={styles.RegisterButtonBox} onPress={() => CreateNewPantryTable(EmailSetText, PantryUserName, Password)}>
+            <Text style={styles.RegisterText}>Register</Text>
+          </TouchableOpacity>
         )}
       </View>
+      <Button title="Login" style={styles.LoginText} onPress={() => NavigateToLogin()}>Login</Button>
     </View>
   );
-}
+};
+//https://colorhunt.co/palette/1235243e7b2785a947efe3c2
 const styles = StyleSheet.create({
-  background: {
-    backgroundColor: '#123524',
+  pageBackground: {
+    backgroundColor: "#123524",
+    width: '100%',
     height: '100%',
-    width: '100%'
+    justifyContent: "center",
+    alignItems: "center",
   },
-  TextInput: {
-    opacity: 10,
-    flex: 1,
-  },
-  ButtonRow: {
-    top: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  buttonView: {
-    top: '20%',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  CreatePantryButton: {
-    alignContent: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    width: '45%',
-    height: '20%',
-    flex: 0,
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#85A947',
-    borderRadius: 5,
-  },
-  Text: {
-    fontSize: 18,
+  title: {
+    fontSize: 40,
     fontWeight: 'bold',
-    fontSize: 20,
-    marginBottom: 20,
-    textAlign: 'center',
     color: '#EFE3C2'
   },
-  closeButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#2196F3',
-    borderRadius: 5,
-    left: 10
+  subtitle: {
+    top: 10,
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#EFE3C2',
+    opacity: 10
   },
-  CreateButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#2196F3',
-    borderRadius: 5,
-    right: 10
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  modalOverlay: {
+  titleBox: {
+    bottom: '15%',
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
   },
-  modalContent: {
-    width: '85%',
-    height: '25%',
+  RegisterBox: {
     padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
+    justifyContent: 'space-between',
+    bottom: '40%',
+    height: '20%',
+    width: '90%',
+    justifyContent: "center",
+    alignItems: "center",
   },
+  EmailInput: {
+    bottom: 30,
+    height: '40%',
+    width: "90%",
+    backgroundColor: '#3E7B27',
+    borderColor: '#EFE3C2',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  PantryNameInput: {
+    bottom: 10,
+    height: '40%',
+    width: "90%",
+    backgroundColor: '#3E7B27',
+    borderColor: '#EFE3C2',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  PasswordInput: {
+    height: '40%',
+    width: "90%",
+    backgroundColor: '#3E7B27',
+    borderColor: '#EFE3C2',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  RegisterButtonBox: {
+    top: '30%',
+    height: '40%',
+    width: "90%",
+    backgroundColor: '#EFE3C2',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  RegisterText: {
+    fontSize: 20,
+    color: 'black'
+  },
+  textInput: {
+    width: '90%',
+    opacity: 10,
+    flex: 1,
+    textAlign: 'left',
+    fontSize: 20,
+    color: '#EFE3C2',
+  },
+  LoginText: {
+    bottom: '33%',
+    fontSize: 14,
+  },
+  ForgotPasswordText: {
+    top: 5,
+    fontSize: 14,
+  }
 
-});
+})
