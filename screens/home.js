@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Button, ImageBackground, FlatList, Text, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import {useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 
 
@@ -12,7 +12,7 @@ export default function HomeScreen({ navigation, route }) {
   const headers = ["Insert ID", "Product ID", "Product Name", "Image", "Date"];
 
   const NavigateToAddPage = () => {
-    navigation.navigate('Add', {"PantryID": PantryID})
+    navigation.navigate('Add', { "PantryID": PantryID })
   };
 
   const NavigateToDeletePage = () => {
@@ -47,7 +47,7 @@ export default function HomeScreen({ navigation, route }) {
     try {
       var products = []
       const pantryData = await GetPantryItems(PantryID);
-      for (var i = 0; i < pantryData.length;  i++) {
+      for (var i = 0; i < pantryData.length; i++) {
         products.push({
           insertID: pantryData[i][0],
           productID: pantryData[i][1],
@@ -99,7 +99,7 @@ export default function HomeScreen({ navigation, route }) {
 
 
   return (
-    <ImageBackground source={image} style={styles.image}>
+    <View style={styles.pageBackground}>
       <View style={styles.tableHeader}>
         {headers.map((header, index) => (
           <Text key={index} style={styles.headerCell}>
@@ -107,29 +107,46 @@ export default function HomeScreen({ navigation, route }) {
           </Text>
         ))}
       </View>
-      <View style={styles.Main}>
-        <FlatList
-          style={styles.cell}
-          data={data}
-          renderItem={renderRow}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      </View>
-      <View style={styles.AddDelete}>
-        <View style={styles.buttonsLeft}>
-          <Button title="Add" style={styles.button} onPress={NavigateToAddPage} />
-        </View>
-        <View style={styles.buttonsRight}>
-          <Button title="Remove" style={styles.button} onPress={NavigateToDeletePage} />
-        </View>
-      </View>
-      <StatusBar style="auto" />
-    </ImageBackground>
+    </View>
+
+    // <ImageBackground source={image} style={styles.image}>
+    //   <View style={styles.tableHeader}>
+    //     {headers.map((header, index) => (
+    //       <Text key={index} style={styles.headerCell}>
+    //         {header}
+    //       </Text>
+    //     ))}
+    //   </View>
+    //   <View style={styles.Main}>
+    //     <FlatList
+    //       style={styles.cell}
+    //       data={data}
+    //       renderItem={renderRow}
+    //       keyExtractor={(item, index) => index.toString()}
+    //     />
+    //   </View>
+    //   <View style={styles.AddDelete}>
+    //     <View style={styles.buttonsLeft}>
+    //       <Button title="Add" style={styles.button} onPress={NavigateToAddPage} />
+    //     </View>
+    //     <View style={styles.buttonsRight}>
+    //       <Button title="Remove" style={styles.button} onPress={NavigateToDeletePage} />
+    //     </View>
+    //   </View>
+    //   <StatusBar style="auto" />
+    // </ImageBackground>
   );
 };
 
 
 const styles = StyleSheet.create({
+  pageBackground: {
+    backgroundColor: "#123524",
+    width: '100%',
+    height: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+  },
   tableHeader: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -147,107 +164,107 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  row: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingVertical: 8,
-    marginTop: 10,
-  },
+  // row: {
+  //   flexDirection: "row",
+  //   borderBottomWidth: 1,
+  //   borderBottomColor: "#ccc",
+  //   paddingVertical: 8,
+  //   marginTop: 10,
+  // },
 
-  cell: {
-    fontSize: 11,
-    flex: 1,
-    textAlign: "center",
-    paddingHorizontal: 8,
-  },
+  // cell: {
+  //   fontSize: 11,
+  //   flex: 1,
+  //   textAlign: "center",
+  //   paddingHorizontal: 8,
+  // },
 
-  Main: {
-    flexDirection: "row",
-    backgroundColor: 'white',
-    height: '60%',
-    width: '97%',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    marginBottom: '50%',
+  // Main: {
+  //   flexDirection: "row",
+  //   backgroundColor: 'white',
+  //   height: '60%',
+  //   width: '97%',
+  //   alignSelf: 'center',
+  //   justifyContent: 'center',
+  //   marginBottom: '50%',
 
-  },
+  // },
 
-  button: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  // button: {
+  //   flex: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  // },
 
-  buttonsLeft: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    paddingLeft: 75,
-  },
+  // buttonsLeft: {
+  //   flex: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'flex-start',
+  //   paddingLeft: 75,
+  // },
 
-  buttonsRight: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    paddingRight: 75,
-  },
+  // buttonsRight: {
+  //   flex: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'flex-end',
+  //   paddingRight: 75,
+  // },
 
-  AddDelete: {
-    position: 'absolute',
-    top: 600,
-    left: 0,
-    right: 0,
-    height: 75,
-    flexDirection: 'row',
-    backgroundColor: 'white'
-  },
+  // AddDelete: {
+  //   position: 'absolute',
+  //   top: 600,
+  //   left: 0,
+  //   right: 0,
+  //   height: 75,
+  //   flexDirection: 'row',
+  //   backgroundColor: 'white'
+  // },
 
-  Header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 125,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#969393',
-    paddingHorizontal: 10,
-  },
-  rightSection: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  centerSection: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  leftSection: {
-    flex: 1,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  text: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  title: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold'
-  },
-  image: {
-    flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-    flexDirection: 'column'
-  },
+  // Header: {
+  //   position: 'absolute',
+  //   top: 0,
+  //   left: 0,
+  //   right: 0,
+  //   height: 125,
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'space-between',
+  //   backgroundColor: '#969393',
+  //   paddingHorizontal: 10,
+  // },
+  // rightSection: {
+  //   flex: 1,
+  //   justifyContent: 'center',
+  // },
+  // centerSection: {
+  //   flex: 2,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
+  // leftSection: {
+  //   flex: 1,
+  //   alignItems: 'flex-end',
+  //   justifyContent: 'center',
+  // },
+  // profileImage: {
+  //   width: 50,
+  //   height: 50,
+  //   borderRadius: 25,
+  // },
+  // text: {
+  //   color: 'white',
+  //   fontSize: 20,
+  //   fontWeight: 'bold',
+  // },
+  // title: {
+  //   color: 'white',
+  //   fontSize: 20,
+  //   fontWeight: 'bold'
+  // },
+  // image: {
+  //   flex: 1,
+  //   resizeMode: 'cover',
+  //   justifyContent: 'center',
+  //   flexDirection: 'column'
+  // },
 });

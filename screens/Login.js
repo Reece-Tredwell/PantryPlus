@@ -24,7 +24,7 @@ export default function CreatePantry({ navigation }) {
     };
 
 
-    const LoginToPantry = async (username, password) => {
+    const LoginToPantry = async (email, password) => {
         console.log("Logging In")
         setIsLoading(true);
         Keyboard.dismiss();
@@ -35,18 +35,18 @@ export default function CreatePantry({ navigation }) {
                 "x-api-key": config["PantryCreateAPIKey"]
             },
             body: JSON.stringify({
-                "username": username,
+                "email": email,
                 "password": password
             })
         });
-
+            console.log(response)
         if (!response.ok) {
             console.log("Failed")
             alert("Incorrect Credentials")
-            console.log(response)
         } else {
             const data = await response.json();
-            setLoginModalVisible(false);
+            console.log(data["PantryKey"])
+            // setLoginModalVisible(false);
             NavigateToHomePage(data["PantryKey"])
         }
     };
@@ -60,7 +60,7 @@ export default function CreatePantry({ navigation }) {
             </View>
             <View style={styles.LoginBox}>
                 <View style={styles.PantryNameInput}>
-                    <TextInput style={styles.textInput} placeholder='PantryName' placeholderTextColor="#EFE3C2" value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
+                    <TextInput style={styles.textInput} placeholder='Email' placeholderTextColor="#EFE3C2" value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
                 </View>
                 <View style={styles.PasswordInput}>
                     <TextInput style={styles.textInput} placeholder='Password' placeholderTextColor="#EFE3C2" value={Password} onChangeText={PasswordSetText}></TextInput>

@@ -41,7 +41,7 @@ export default function CreatePantry({ navigation }) {
 
     if (!response.ok) {
         console.log("Failed")
-        alert("Incorrect Credentials")
+        alert("Pantry Creation Failed")
         console.log(response)
     } else {
         const data = await response.json();
@@ -72,7 +72,7 @@ export default function CreatePantry({ navigation }) {
     const data = await response.json();
     console.log(data);
     setCreateModalVisible(false);
-    LoginToPantry(username, password)
+    LoginToPantry(email, password)
   };
 
 
