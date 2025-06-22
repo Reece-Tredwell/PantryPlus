@@ -8,8 +8,6 @@ import { navigate } from 'expo-router/build/global-state/routing';
 export default function CreatePantry({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [secureText, setSecureText] = useState(true);
-  const [CreateModalVisible, setCreateModalVisible] = useState(false);
-  const [LoginModalVisible, setLoginModalVisible] = useState(false);
   const [PantryUserName, UsernameSetText] = useState('');
   const [Password, PasswordSetText] = useState('');
   const [EmailSetText, setEmail] = useState('');
@@ -23,35 +21,9 @@ export default function CreatePantry({ navigation }) {
     navigation.navigate('Login')
   };
 
-  const LoginToPantry = async (username, password) => {
+  const LoginToPantry = async (email, password) => {
     console.log("Logging In")
-    setIsLoading(true);
-    Keyboard.dismiss();
     const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/LoginToPantry", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": config["PantryCreateAPIKey"]
-        },
-        body: JSON.stringify({
-            "username": username,
-            "password": password
-        })
-    });
-
-    if (!response.ok) {
-        console.log("Failed")
-        alert("Pantry Creation Failed")
-        console.log(response)
-    } else {
-        const data = await response.json();
-        setLoginModalVisible(false);
-        NavigateToHomePage(data["PantryKey"])
-    }
-};
-
-  const CreateNewPantryTable = async (email, username, password) => {
-    const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/CreateNewPantryTable", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -59,20 +31,61 @@ export default function CreatePantry({ navigation }) {
       },
       body: JSON.stringify({
         "email": email,
-        "username": username,
         "password": password
       })
-    })
-    console.log(response)
+    });
     if (!response.ok) {
       console.log("Failed")
+      alert("Pantry login Failed")
       console.log(response)
-      throw new Error(`Failed to create pantry table: ${response.status} ${response.statusText}`);
+    } else {
+      const data = await response.json();
+      setLoginModalVisible(false);
+      NavigateToHomePage(data["PantryKey"])
     }
-    const data = await response.json();
-    console.log(data);
-    setCreateModalVisible(false);
-    LoginToPantry(email, password)
+  };
+
+
+
+
+  const isEmailValid = (email) => {
+    if (email.length < 3 || !email.includes("@")) {
+      return false
+    } else {
+      return true;
+    };
+  }
+
+
+  const CreateNewPantryTable = async (email, username, password) => {
+    if (isEmailValid(email) === false) {
+      alert("Invalid email")
+    } else {
+      Keyboard.dismiss();
+      setIsLoading(true);
+      const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/CreateNewPantryTable", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": config["PantryCreateAPIKey"]
+        },
+        body: JSON.stringify({
+          "email": email,
+          "username": username,
+          "password": password
+        })
+      })
+      console.log(response)
+      if (!response.ok) {
+        alert("Pantry Creation Failed")
+        setIsLoading(false);
+        throw new Error(`Failed to create pantry table: ${response.status} ${response.statusText}`);
+      }else{
+      console.log("creation Successful, Loggin in")
+      alert("Pantry Creation Successful")
+      LoginToPantry(email, password)
+      }
+    }
   };
 
 

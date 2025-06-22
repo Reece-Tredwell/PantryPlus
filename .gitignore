@@ -1,7 +1,9 @@
 # OSX
 #
 .DS_Store
-.config.json
+config.json
+package.json
+package-lock.json
 # Android/IntelliJ
 #
 build/
@@ -15,3 +17,5 @@ local.properties
 
 # Bundle artifacts
 *.jsbundle
+node_modules
+

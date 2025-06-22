@@ -23,31 +23,44 @@ export default function CreatePantry({ navigation }) {
         navigation.navigate('Home', { "PantryID": DBID })
     };
 
+    const isEmailValid = (email) => {
+        if (email.length < 3 || !email.includes("@")) {
+            return false
+        } else {
+            return true;
+        };
+    }
 
     const LoginToPantry = async (email, password) => {
-        console.log("Logging In")
-        setIsLoading(true);
-        Keyboard.dismiss();
-        const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/LoginToPantry", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": config["PantryCreateAPIKey"]
-            },
-            body: JSON.stringify({
-                "email": email,
-                "password": password
-            })
-        });
-            console.log(response)
-        if (!response.ok) {
-            console.log("Failed")
-            alert("Incorrect Credentials")
+        //check if email is valid
+        console.log("Here")
+        if (isEmailValid(email) === false) {
+            console.log("here")
+            alert("Invalid email")
         } else {
-            const data = await response.json();
-            console.log(data["PantryKey"])
-            // setLoginModalVisible(false);
-            NavigateToHomePage(data["PantryKey"])
+            console.log("Logging In")
+            setIsLoading(true);
+            Keyboard.dismiss();
+            const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/LoginToPantry", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": config["PantryCreateAPIKey"]
+                },
+                body: JSON.stringify({
+                    "email": email,
+                    "password": password
+                })
+            });
+            if (!response.ok) {
+                console.log("Failed")
+                setIsLoading(false);
+                alert("Incorrect Credentials")
+            } else {
+                const data = await response.json();
+                console.log(data["PantryKey"])
+                NavigateToHomePage(data["PantryKey"])
+            }
         }
     };
 
@@ -78,6 +91,7 @@ export default function CreatePantry({ navigation }) {
         </View>
     );
 };
+
 //https://colorhunt.co/palette/1235243e7b2785a947efe3c2
 const styles = StyleSheet.create({
     pageBackground: {
@@ -93,7 +107,7 @@ const styles = StyleSheet.create({
         color: '#EFE3C2'
     },
     subtitle: {
-        top: 10,
+        top: 5,
         fontSize: 25,
         fontWeight: 'bold',
         color: '#EFE3C2',
@@ -140,7 +154,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     LoginButtonBox: {
-        top: '30%',
+        top: '5%',
         height: '40%',
         width: "90%",
         backgroundColor: '#EFE3C2',
@@ -164,10 +178,11 @@ const styles = StyleSheet.create({
         color: '#EFE3C2',
     },
     newPantryText: {
-        bottom: '34%',
+        bottom: '37%',
         fontSize: 14,
     },
     ForgotPasswordText: {
+        bottom: '10%',
         top: 5,
         fontSize: 14,
     }

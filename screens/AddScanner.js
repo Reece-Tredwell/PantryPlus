@@ -1,15 +1,16 @@
 import { Camera, CameraView } from 'expo-camera';
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
-import {View, Text, Modal, StyleSheet, TouchableOpacity  } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { DataTable } from 'react-native-paper';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 import { useNavigationState, useFocusEffect } from '@react-navigation/native';
 
 
-export default function AddScanner({route}) {
-  const { PantryID } = route.params
+export default function AddScanner({ route }) {
+  const scanLock = useRef(false);
+  const { PantryID }= route.params;
   const [data, setData] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -29,24 +30,30 @@ export default function AddScanner({route}) {
   };
 
   const handleBarcodeScanned = ({ data: barcode }) => {
-    if (!scanned) {
-      setScanned(true); 
-      console.log("Barcode Number Read: " + barcode);
-      fetchData(barcode).finally(() => {
-        setTimeout(() => setScanned(false), 3000); 
+    if (scanLock.current) return;
+
+    console.log("Barcode Number Read: " + barcode);
+    scanLock.current = true;
+    setScanned(true);
+
+    fetchData(barcode)
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setScanned(false);
+        scanLock.current = false;
       });
-    }
   };
-  
+
   const increment = () => setQuantity(prevQuantity => prevQuantity + 1);
   const decrement = () => setQuantity(prevQuantity => Math.max(0, prevQuantity - 1));
 
-  const insertItem = async(productID, Image, productName) =>{
-    try{
+  const insertItem = async (productID, Image, productName) => {
+    console.log(PantryID)
+    try {
       const response = await fetch(`https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/insertItem`, {
         method: "POST",
         headers: {
-          "accept":"application/json",
+          "accept": "application/json",
           "Content-Type": "application/json",
           "x-api-key": config["PantryCreateAPIKey"]
         },
@@ -54,13 +61,13 @@ export default function AddScanner({route}) {
           "DBID": PantryID,
           "itemQuant": Quantity,
           "itemData": {
-                  "productID": productID,
-                  "productName": productName,
-                  "Image": Image,
-                  "userID": "1",
-                  "dateAdded": new Date()
-              }
-          })
+            "productID": productID,
+            "productName": productName,
+            "Image": Image,
+            "userID": "1",
+            "dateAdded": new Date()
+          }
+        })
       });
       console.log(response)
       if (!response.ok) {
@@ -68,13 +75,25 @@ export default function AddScanner({route}) {
         console.log(response)
         throw new Error(`Failed To Add Data: ${response.status} ${response.statusText}`);
       }
-    }catch{
+    } catch {
       console.log(response)
       console.log("Failed To Insert Data Into Pantry")
     }
     setModalVisible(false)
   }
-  
+
+  const ifClosed = () => {
+    setModalVisible(false)
+    setScanned(false)
+    scanLock.current = false;
+  }
+
+  const ifAdded = () => {
+    insertItem(data.code, data.product.image_front_thumb_url, data.product.product_name)
+    setModalVisible(false)
+    setScanned(false)
+    scanLock.current = false;
+  }
 
   return (
     <View style={styles.page}>
@@ -83,7 +102,7 @@ export default function AddScanner({route}) {
         style={StyleSheet.absoluteFillObject}
         facing="back"
         onBarcodeScanned={handleBarcodeScanned}
-      />  
+      />
       {modalVisible && (
         <Modal
           animationType="slide"
@@ -94,42 +113,42 @@ export default function AddScanner({route}) {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
 
-          <DataTable style={styles.container}>
-            <DataTable.Row>
-              <DataTable.Cell style={styles.titleCell}>Product ID</DataTable.Cell>
-              <DataTable.Cell>{data.code}</DataTable.Cell>
-            </DataTable.Row>
-            <DataTable.Row>
-              <DataTable.Cell style={styles.titleCell}>Product Name</DataTable.Cell>
-              <DataTable.Cell>{data.product.product_name || "N/A"}</DataTable.Cell>
-            </DataTable.Row>
-            <DataTable.Row>
-              <DataTable.Cell style={styles.titleCell}>Manufacturer</DataTable.Cell>
-              <DataTable.Cell>{data.product.brands || "N/A"}</DataTable.Cell>
-            </DataTable.Row>
-          </DataTable>
-          <Image 
-          source={{ uri: data.product.image_front_thumb_url }}
-          style={{ width: 100, height: 100 }}
-          />
-          <Text style={styles.QuantTitle}>Quantity</Text>
-          <View style={styles.Counter}>
-            <TouchableOpacity style={styles.DecButton} onPress={decrement}>
-              <Text style={styles.closeButtonText}>-</Text>
-            </TouchableOpacity>
-              <Text style={styles.number}>{Quantity}</Text>
-            <TouchableOpacity style={styles.IncButton} onPress={increment}>
-              <Text style={styles.closeButtonText}>+</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.ButtonRow}>
-            <TouchableOpacity style={styles.AddButton} onPress={() => insertItem(data.code, data.product.image_front_thumb_url, data.product.product_name)}>
-              <Text style={styles.closeButtonText}> Add </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>    
+              <DataTable style={styles.container}>
+                <DataTable.Row>
+                  <DataTable.Cell style={styles.titleCell}>Product ID</DataTable.Cell>
+                  <DataTable.Cell>{data.code}</DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row>
+                  <DataTable.Cell style={styles.titleCell}>Product Name</DataTable.Cell>
+                  <DataTable.Cell>{data.product.product_name || "N/A"}</DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row>
+                  <DataTable.Cell style={styles.titleCell}>Manufacturer</DataTable.Cell>
+                  <DataTable.Cell>{data.product.brands || "N/A"}</DataTable.Cell>
+                </DataTable.Row>
+              </DataTable>
+              <Image
+                source={{ uri: data.product.image_front_thumb_url }}
+                style={{ width: 100, height: 100 }}
+              />
+              <Text style={styles.QuantTitle}>Quantity</Text>
+              <View style={styles.Counter}>
+                <TouchableOpacity style={styles.DecButton} onPress={decrement}>
+                  <Text style={styles.closeButtonText}>-</Text>
+                </TouchableOpacity>
+                <Text style={styles.number}>{Quantity}</Text>
+                <TouchableOpacity style={styles.IncButton} onPress={increment}>
+                  <Text style={styles.closeButtonText}>+</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.ButtonRow}>
+                <TouchableOpacity style={styles.closeButton} onPress={() => ifClosed()}>
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.AddButton} onPress={() => ifAdded()}>
+                  <Text style={styles.closeButtonText}> Add </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>
@@ -143,33 +162,33 @@ const styles = StyleSheet.create({
     top: 10,
     flexDirection: 'row',
   },
-  QuantTitle:{
+  QuantTitle: {
     top: 10,
     fontWeight: 'bold',
     fontSize: 15
-  },  
+  },
   number: {
     top: 15,
     fontSize: 20
-  }, 
+  },
   IncButton: {
     left: 10,
     marginTop: 10,
     padding: 10,
     backgroundColor: '#2196F3',
     borderRadius: 5,
-  },  
+  },
   DecButton: {
     right: 10,
     marginTop: 10,
     padding: 10,
     backgroundColor: '#2196F3',
     borderRadius: 5,
-  },  
+  },
   Counter: {
-    top:10,
+    top: 10,
     flexDirection: 'row',
-}, 
+  },
   titleCell: {
     flex: 1,
     fontWeight: 'bold',
@@ -211,14 +230,14 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#2196F3',
     borderRadius: 5,
-    left:10
+    right: 5
   },
   AddButton: {
     marginTop: 10,
     padding: 10,
     backgroundColor: '#2196F3',
     borderRadius: 5,
-    right:10
+    left: 5
   },
   closeButtonText: {
     color: 'white',

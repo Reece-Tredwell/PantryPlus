@@ -5,7 +5,7 @@ import { useNavigationState, useFocusEffect } from '@react-navigation/native';
 
 export default function Add({ navigation, route }) {
 const [permission, requestPermission] = useCameraPermissions();
-const { PantryID } = route.params
+const { PantryID }= route.params
 const NavigateToAddScanner = ()  => {
   navigation.navigate('AddScanner', {"PantryID": PantryID})
 };
