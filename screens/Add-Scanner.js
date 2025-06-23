@@ -10,7 +10,7 @@ import { useNavigationState, useFocusEffect } from '@react-navigation/native';
 
 export default function AddScanner({ route }) {
   const scanLock = useRef(false);
-  const { PantryID }= route.params;
+  const { PantryID } = route.params;
   const [data, setData] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -48,8 +48,14 @@ export default function AddScanner({ route }) {
   const decrement = () => setQuantity(prevQuantity => Math.max(0, prevQuantity - 1));
 
   const insertItem = async (productID, Image, productName) => {
+
     console.log(PantryID)
     try {
+      if (Image == null) {
+        Image = ""
+      }
+      console.log("Image: ")
+      console.log(Image)
       const response = await fetch(`https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/insertItem`, {
         method: "POST",
         headers: {

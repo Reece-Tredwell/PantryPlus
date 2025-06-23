@@ -1,15 +1,25 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Button, ImageBackground, FlatList, Text, Image } from 'react-native';
+import { StyleSheet, View, Button, ScrollView, Text, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 
 
+function ProductCard({ product }) {
+  return (
+    <View style={styles.card}>
+      <Text numberOfLines={1} ellipsizeMode="tail"> {product.productName} </Text>
+      <Image source={{ uri: product.image }} style={styles.image} />
+      <Text> Date Added:  {product.dateAdded}</Text>
+    </View>
+  );
+}
+
 export default function HomeScreen({ navigation, route }) {
-  const [data, setData] = useState(null);
-  const image = { uri: "https://dkdesignkitchens.com.au/wp-content/uploads/7-Tips-For-Designing-The-Perfect-Walk-in-Pantry.jpg" };
-  const { PantryID }= route.params
-  const headers = ["Product ID", "Product Name", "Image", "Date"];
+  const [data, setData] = useState([]);
+  const { PantryID } = route.params
+
+
 
   const NavigateToAddPage = () => {
     navigation.navigate('Add', { "PantryID": PantryID })
@@ -19,6 +29,7 @@ export default function HomeScreen({ navigation, route }) {
     console.log(PantryID)
     navigation.navigate('Delete', { "PantryID": PantryID });
   };
+
 
   const GetPantryItems = async (ID) => {
     try {
@@ -42,6 +53,8 @@ export default function HomeScreen({ navigation, route }) {
       console.log("Cannot Retrieve Pantry Data")
     }
   }
+
+
 
   const fetchPantryData = async () => {
     try {
@@ -72,50 +85,22 @@ export default function HomeScreen({ navigation, route }) {
   );
 
 
-  const renderRow = ({ item }) => {
-    const keys = Object.keys(item);
-    return (
-      <View style={styles.row}>
-        {keys.map((key) => {
-          if (key === "image") {
-            return (
-              <Image
-                key={key}
-                source={{ uri: item[key] }}
-                style={styles.image}
-              />
-            );
-          }
-          return (
-            <Text key={key} style={styles.cell}>
-              {item[key]}
-            </Text>
-          );
-        })}
-      </View>
-    );
-  };
-
-
   return (
     <View style={styles.pageBackground}>
-      <Text style={styles.pageHeader}>Pantry Plus</Text>
-      <View style={styles.tableHeader}>
-        {headers.map((header, index) => (
-          <Text key={index} style={styles.headerCell}>
-            {header}
-          </Text>
-        ))}
+      <View style={styles.pageHeader}>
+        <Text style={styles.pageTitle}>Pantry Plus</Text>
       </View>
-      <View style={styles.Main}>
-        <FlatList
-          style={styles.cell}
-          data={data}
-          renderItem={renderRow}
-          keyExtractor={(item, index) => index.toString()}
-        />
+      <View style={styles.gridWrapper}>
+        <ScrollView contentContainerStyle={styles.gridContainer}>
+          {data.map((product) => (
+            <View style={styles.gridItem} key={product.productID}>
+              <ProductCard product={product} />
+            </View>
+          ))}
+        </ScrollView>
       </View>
-      <View style={styles.AddDelete}>
+
+      <View style={styles.footer}>
         <View style={styles.buttonsLeft}>
           <Button title="Add" style={styles.button} onPress={NavigateToAddPage} />
         </View>
@@ -124,17 +109,53 @@ export default function HomeScreen({ navigation, route }) {
         </View>
       </View>
       <StatusBar style="auto" />
-    </View>
+    </View >
   );
 };
 
 
 const styles = StyleSheet.create({
-  pageHeader: {
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    padding: 10,
+  },
+  gridWrapper: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  gridItem: {
+    width: '48%', 
+    marginBottom: 12,
+  },
+  card: {
+    borderRadius: 10,
+    padding: 10,
+    top: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    backgroundColor: "#f5fdfe"
+  },
+  pageTitle: {
     fontSize: 40,
     fontWeight: 'bold',
     color: '#EFE3C2',
-    top: '3%'
+    top: 40
+  },
+  pageHeader: {
+    justifyContent:'center',
+    alignItems: "center",
+    width:'100%',
+    height:'15%',
+    backgroundColor:"#123524"
   },
   pageBackground: {
     backgroundColor: "#123524",
@@ -208,13 +229,15 @@ const styles = StyleSheet.create({
     paddingRight: 75,
   },
 
-  AddDelete: {
-    position: 'absolute',
-    top: '83%',
-    height: 75,
-    width: "95%",
+  footer: {
+    bottom: 0,
+    height:'10%',
+    width: "100%",
     flexDirection: 'row',
-    backgroundColor: "#EFE3C2"
+    backgroundColor: "#EFE3C2",
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
   },
 
   Header: {
@@ -259,9 +282,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   image: {
-    flex: 1,
+    width: '100%',
+    height: 100,
     resizeMode: 'cover',
-    justifyContent: 'center',
-    flexDirection: 'column'
-  },
+    borderRadius: 10,
+  }
 });

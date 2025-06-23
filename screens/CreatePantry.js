@@ -40,7 +40,8 @@ export default function CreatePantry({ navigation }) {
       console.log(response)
     } else {
       const data = await response.json();
-      setLoginModalVisible(false);
+      console.log("navigating")
+      print(data["PantryKey"])
       NavigateToHomePage(data["PantryKey"])
     }
   };
@@ -81,8 +82,7 @@ export default function CreatePantry({ navigation }) {
         setIsLoading(false);
         throw new Error(`Failed to create pantry table: ${response.status} ${response.statusText}`);
       }else{
-      console.log("creation Successful, Loggin in")
-      alert("Pantry Creation Successful")
+      console.log("creation Successful, Logging in")
       LoginToPantry(email, password)
       }
     }

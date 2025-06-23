@@ -15,11 +15,11 @@ export default function Delete({ navigation, route }) {
 
   const NavigateToDeleteScanner = () => {
     console.log(PantryID)
-    navigation.navigate('ScanDelete', {"PantryID": PantryID})
+    navigation.navigate('Scan-Delete', {"PantryID": PantryID})
   };
 
   const NavigateToSelectDelete = () => {
-    navigation.navigate('SelectDelete',{ data: data })
+    navigation.navigate('Select-Delete',{ data: data })
   };
 
 

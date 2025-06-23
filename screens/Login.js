@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ActivityIndicator, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, Keyboard } from 'react-native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 import React, { useState } from 'react';
 import { Button, DataTable, Title } from 'react-native-paper';
@@ -76,7 +76,7 @@ export default function CreatePantry({ navigation }) {
                     <TextInput style={styles.textInput} placeholder='Email' placeholderTextColor="#EFE3C2" value={PantryUserName} onChangeText={UsernameSetText}></TextInput>
                 </View>
                 <View style={styles.PasswordInput}>
-                    <TextInput style={styles.textInput} placeholder='Password' placeholderTextColor="#EFE3C2" value={Password} onChangeText={PasswordSetText}></TextInput>
+                    <TextInput style={styles.textInput} secureTextEntry={true} placeholder='Password' placeholderTextColor="#EFE3C2" value={Password} onChangeText={PasswordSetText}></TextInput>
                 </View>
                 <Button title="Forgot Password?" style={styles.ForgotPasswordText} onPress={() => ForgotPassword()}>Forgot Password?</Button>
                 {isLoading ? (
