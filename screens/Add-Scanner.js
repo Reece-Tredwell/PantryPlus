@@ -22,7 +22,6 @@ export default function AddScanner({ route }) {
         `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
       );
       setData(response.data);
-      console.log("Fetched data:", response.data);
       setModalVisible(true);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -49,13 +48,12 @@ export default function AddScanner({ route }) {
 
   const insertItem = async (productID, Image, productName) => {
 
-    console.log(PantryID)
+ 
     try {
       if (Image == null) {
         Image = ""
       }
-      console.log("Image: ")
-      console.log(Image)
+
       const response = await fetch(`https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/insertItem`, {
         method: "POST",
         headers: {
@@ -75,7 +73,6 @@ export default function AddScanner({ route }) {
           }
         })
       });
-      console.log(response)
       if (!response.ok) {
         console.log("Failed")
         console.log(response)

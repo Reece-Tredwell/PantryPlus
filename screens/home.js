@@ -6,10 +6,12 @@ import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 
 
 function ProductCard({ product }) {
+  const isRemoteImage = typeof product.image === 'string' && product.image.startsWith('http');
+
   return (
     <View style={styles.card}>
-      <Text numberOfLines={1} ellipsizeMode="tail"> {product.productName} </Text>
-      <Image source={{ uri: product.image }} style={styles.image} />
+      <Text numberOfLines={1} ellipsizeMode="tail" style={styles.cardTitle}> {product.productName} </Text>
+      <Image source={isRemoteImage ? { uri: product.image } : product.image} style={styles.image} />
       <Text> Date Added:  {product.dateAdded}</Text>
     </View>
   );
@@ -26,7 +28,6 @@ export default function HomeScreen({ navigation, route }) {
   };
 
   const NavigateToDeletePage = () => {
-    console.log(PantryID)
     navigation.navigate('Delete', { "PantryID": PantryID });
   };
 
@@ -55,16 +56,20 @@ export default function HomeScreen({ navigation, route }) {
   }
 
 
-
   const fetchPantryData = async () => {
     try {
       var products = []
       const pantryData = await GetPantryItems(PantryID);
       for (var i = 0; i < pantryData.length; i++) {
+        image = pantryData[i][4]
+        if (pantryData[i][4] == "") {
+          image = require('../assets/no-Image-Available.jpg')
+        }
         products.push({
+          insertID: pantryData[i][0],
           productID: pantryData[i][1],
           productName: pantryData[i][2],
-          image: pantryData[i][4],
+          image: image,
           dateAdded: pantryData[i][5]
         });
       }
@@ -93,7 +98,7 @@ export default function HomeScreen({ navigation, route }) {
       <View style={styles.gridWrapper}>
         <ScrollView contentContainerStyle={styles.gridContainer}>
           {data.map((product) => (
-            <View style={styles.gridItem} key={product.productID}>
+            <View style={styles.gridItem} key={product.insertID}>
               <ProductCard product={product} />
             </View>
           ))}
@@ -115,29 +120,33 @@ export default function HomeScreen({ navigation, route }) {
 
 
 const styles = StyleSheet.create({
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    justifyContent: 'center',
+    textAlign: "center",
+  },
   gridContainer: {
+    borderRadius: '1%',
+    backgroundColor:"#EFE3C2",
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+    paddingBottom: 30,
   },
   gridWrapper: {
     flex: 1,
     paddingHorizontal: 10,
   },
-  name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-  },
   gridItem: {
-    width: '48%', 
-    marginBottom: 12,
+    width: '48%',
+    marginBottom: 16,
   },
   card: {
     borderRadius: 10,
     padding: 10,
-    top: 50,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
@@ -151,11 +160,11 @@ const styles = StyleSheet.create({
     top: 40
   },
   pageHeader: {
-    justifyContent:'center',
+    justifyContent: 'center',
     alignItems: "center",
-    width:'100%',
-    height:'15%',
-    backgroundColor:"#123524"
+    width: '100%',
+    height: '15%',
+    backgroundColor: "#123524"
   },
   pageBackground: {
     backgroundColor: "#123524",
@@ -231,7 +240,7 @@ const styles = StyleSheet.create({
 
   footer: {
     bottom: 0,
-    height:'10%',
+    height: '10%',
     width: "100%",
     flexDirection: 'row',
     backgroundColor: "#EFE3C2",

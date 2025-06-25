@@ -22,7 +22,6 @@ export default function CreatePantry({ navigation }) {
   };
 
   const LoginToPantry = async (email, password) => {
-    console.log("Logging In")
     const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/LoginToPantry", {
       method: "POST",
       headers: {
@@ -40,7 +39,6 @@ export default function CreatePantry({ navigation }) {
       console.log(response)
     } else {
       const data = await response.json();
-      console.log("navigating")
       print(data["PantryKey"])
       NavigateToHomePage(data["PantryKey"])
     }

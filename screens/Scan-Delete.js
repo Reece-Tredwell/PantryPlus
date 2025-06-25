@@ -21,7 +21,6 @@ export default function AddScanner({ route }) {
                 `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
             );
             setData(response.data);
-            console.log("Fetched data:", response.data);
             setModalVisible(true);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -40,9 +39,6 @@ export default function AddScanner({ route }) {
     };
 
     const removeItem = async (productBarcode, PantryID) => {
-        console.log("Here")
-        console.log("code:", productBarcode)
-        console.log("ID:", PantryID)
         try {
             const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/deleteDataFromPantry", {
                 method: "POST",
@@ -56,7 +52,6 @@ export default function AddScanner({ route }) {
                 })
             }
             )
-            console.log(response)
         } catch (error) {
             console.error("error found: ", error)
         }

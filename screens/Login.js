@@ -33,12 +33,9 @@ export default function CreatePantry({ navigation }) {
 
     const LoginToPantry = async (email, password) => {
         //check if email is valid
-        console.log("Here")
         if (isEmailValid(email) === false) {
-            console.log("here")
             alert("Invalid email")
         } else {
-            console.log("Logging In")
             setIsLoading(true);
             Keyboard.dismiss();
             const response = await fetch("https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/LoginToPantry", {
@@ -58,7 +55,6 @@ export default function CreatePantry({ navigation }) {
                 alert("Incorrect Credentials")
             } else {
                 const data = await response.json();
-                console.log(data["PantryKey"])
                 NavigateToHomePage(data["PantryKey"])
             }
         }
