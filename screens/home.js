@@ -22,6 +22,7 @@ function ProductCard({ product }) {
 export default function HomeScreen({ navigation, route }) {
   const [data, setData] = useState([]);
   const { PantryID } = route.params
+  const [PantryName, setPantryName] = useState("");
 
 
 
@@ -33,9 +34,23 @@ export default function HomeScreen({ navigation, route }) {
     navigation.navigate('Delete', { "PantryID": PantryID });
   };
 
-  const NavigateToProfilePage = () => {
-    navigation.navigate('Profile', { "PantryID": PantryID });
+  const NavigateToProfilePage = async () => {
+    navigation.navigate('Profile', { "PantryID": PantryID, "username": PantryName });
   };
+
+  const getPantryName = async (ID) => {
+    const response = await fetch(`https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/getPantryData`, {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "x-api-key": config["PantryCreateAPIKey"]
+      },
+      body: JSON.stringify({ "ID": ID })
+    });
+    const data = await response.json();
+    return data.username
+  }
 
 
   const GetPantryItems = async (ID) => {
@@ -86,8 +101,15 @@ export default function HomeScreen({ navigation, route }) {
   };
 
 
-  useEffect(() => {
-  }, [data]);
+useEffect(() => {
+  const loadPantryName = async () => {
+    const pantryName = await getPantryName(PantryID);
+    setPantryName(pantryName);
+  };
+  loadPantryName();
+}, [data]);
+
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -205,12 +227,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingRight: 75,
   },
-  footerIcon:{
-    justifyContent:"center",
-    alignItems: "center", 
-    bottom:10,
-    height:60,
-    width:85
+  footerIcon: {
+    justifyContent: "center",
+    alignItems: "center",
+    bottom: 10,
+    height: 60,
+    width: 85
   },
   footer: {
     bottom: 0,

@@ -1,36 +1,24 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useCameraPermissions } from 'expo-camera';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { useNavigationState, useFocusEffect } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 
 export default function Profile({ navigation, route }) {
     const [permission, requestPermission] = useCameraPermissions();
-    const { PantryID } = route.params
+    const username = route.params?.username;
 
     const Logout = () => {
         navigation.navigate('Login')
     }
 
-    const getPantryName = async (ID) => {
-        const response = await fetch(`https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Test/getPantryData`, {
-            method: "POST",
-            headers: {
-                "accept": "application/json",
-                "Content-Type": "application/json",
-                "x-api-key": config["PantryCreateAPIKey"]
-            },
-            body: JSON.stringify({ "ID": ID })
-        });
-        console.log(response)
-    }
-
-    useEffect(() => {
-        getPantryName(PantryID);
-    }, []);
-
-
     return (
         <View style={styles.pageBackground}>
+            <View style={styles.pageHeader}>
+                <EvilIcons name="user" size={200} color="white" />
+                <Text style={styles.pageTitle}>{username}</Text>
+            </View>
             <TouchableOpacity style={styles.LogoutButton} onPress={Logout}>
                 <Text style={styles.Logout}>Logout</Text>
             </TouchableOpacity>
@@ -42,6 +30,24 @@ export default function Profile({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+    pageTitle: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        color: '#EFE3C2',
+    },
+    pageTitle: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        color: '#EFE3C2',
+
+    },
+    pageHeader: {
+        justifyContent: 'center',
+        alignItems: "center",
+        width: '100%',
+        height: '15%',
+        backgroundColor: "#123524"
+    },
     pageBackground: {
         backgroundColor: "#123524",
         width: '100%',
