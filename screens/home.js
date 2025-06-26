@@ -14,14 +14,14 @@ function ProductCard({ product }) {
     <View style={styles.card}>
       <Text numberOfLines={1} ellipsizeMode="tail" style={styles.cardTitle}> {product.productName} </Text>
       <Image source={isRemoteImage ? { uri: product.image } : product.image} style={styles.image} />
-      <Text> Date Added:  {product.dateAdded}</Text>
+      <Text style={styles.date}> Date Added:  {product.dateAdded}</Text>
     </View>
   );
 }
 
 export default function HomeScreen({ navigation, route }) {
-  const [data, setData] = useState([]);
-  const { PantryID } = route.params
+  const [data, setData] = useState(route.params?.Data ?? []);
+  const PantryID = route.params?.PantryID;
   const [PantryName, setPantryName] = useState("");
 
 
@@ -82,9 +82,9 @@ export default function HomeScreen({ navigation, route }) {
       var products = []
       const pantryData = await GetPantryItems(PantryID);
       for (var i = 0; i < pantryData.length; i++) {
-        image = pantryData[i][4]
-        if (pantryData[i][4] == "") {
-          image = require('../assets/no-Image-Available.jpg')
+        let image = pantryData[i][4];
+        if (!image) {
+          image = require('../assets/no-Image-Available.jpg');
         }
         products.push({
           insertID: pantryData[i][0],
@@ -101,13 +101,13 @@ export default function HomeScreen({ navigation, route }) {
   };
 
 
-useEffect(() => {
-  const loadPantryName = async () => {
-    const pantryName = await getPantryName(PantryID);
-    setPantryName(pantryName);
-  };
-  loadPantryName();
-}, [data]);
+  useEffect(() => {
+    const loadPantryName = async () => {
+      const pantryName = await getPantryName(PantryID);
+      setPantryName(pantryName);
+    };
+    loadPantryName();
+  }, [PantryID]);
 
 
 
@@ -154,6 +154,10 @@ useEffect(() => {
 
 
 const styles = StyleSheet.create({
+  date: {
+    fontSize: 12,
+    top: 5,
+  },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',

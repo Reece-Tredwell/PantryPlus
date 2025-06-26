@@ -9,18 +9,20 @@ export default function CreatePantry({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [PantryUserName, UsernameSetText] = useState('');
     const [Password, PasswordSetText] = useState('');
+    const [PantryID, setPantryID] = useState('');
+    const [Data, setData] = useState([]);
 
     const ForgotPassword = () => {
         //TODO
     };
 
     const navigateToCreatePantry = () => {
-        navigation.navigate('CreatePantry')
+        navigation.navigate('CreatePantry',)
     }
 
     const NavigateToHomePage = (DBID) => {
-        navigation.navigate('Home', { "PantryID": DBID })
-        isLoading = false
+        navigation.navigate('Home', { "PantryID": DBID, "Data": Data })
+        setIsLoading(false)
         console.log(isLoading)
     };
 
@@ -56,8 +58,60 @@ export default function CreatePantry({ navigation }) {
                 alert("Incorrect Credentials")
             } else {
                 const data = await response.json();
+                const pantryKey = data["PantryKey"]
+                setPantryID(pantryKey)
+                const pantryItems = await fetchPantryData(pantryKey)
+                setData(pantryItems);
                 NavigateToHomePage(data["PantryKey"])
             }
+        }
+    };
+
+
+    const GetPantryItems = async (ID) => {
+        try {
+            const response = await fetch(`https://cfaem0qp2j.execute-api.ap-southeast-2.amazonaws.com/Production/GetPantryItems`, {
+                method: "POST",
+                headers: {
+                    "accept": "application/json",
+                    "Content-Type": "application/json",
+                    "x-api-key": config["PantryCreateAPIKey"]
+                },
+                body: JSON.stringify({ "ID": ID })
+            });
+            if (!response.ok) {
+                console.log("Failed")
+                throw new Error(`Failed to Get Data From Pantry: ${response.status} ${response.statusText}`);
+            }
+            const data = await response.json();
+            return data;
+        } catch {
+            alert("Cannot Retrieve Pantry Data")
+            console.log("Cannot Retrieve Pantry Data")
+        }
+    }
+
+
+    const fetchPantryData = async (id) => {
+        try {
+            var products = []
+            const pantryData = await GetPantryItems(id);
+            for (var i = 0; i < pantryData.length; i++) {
+                let image = pantryData[i][4];
+                if (!image) {
+                    image = require('../assets/no-Image-Available.jpg');
+                }
+                products.push({
+                    insertID: pantryData[i][0],
+                    productID: pantryData[i][1],
+                    productName: pantryData[i][2],
+                    image: image,
+                    dateAdded: pantryData[i][5]
+                });
+            }
+            setData(products)
+        } catch (error) {
+            console.error("Error fetching pantry data:", error);
         }
     };
 
@@ -78,9 +132,9 @@ export default function CreatePantry({ navigation }) {
                 <Button title="Forgot Password?" style={styles.ForgotPasswordText} onPress={() => ForgotPassword()}>Forgot Password?</Button>
 
                 {isLoading ? (
-                        <TouchableOpacity style={styles.LoginButtonBoxLoading} onPress={() => LoginToPantry(PantryUserName, Password)} disabled={true}>
-                            <Text style={styles.LoginText}>Login</Text>
-                        </TouchableOpacity>
+                    <TouchableOpacity style={styles.LoginButtonBoxLoading} onPress={() => LoginToPantry(PantryUserName, Password)} disabled={true}>
+                        <Text style={styles.LoginText}>Login</Text>
+                    </TouchableOpacity>
                 ) : (
                     <TouchableOpacity style={styles.LoginButtonBox} onPress={() => LoginToPantry(PantryUserName, Password)}>
                         <Text style={styles.LoginText}>Login</Text>
@@ -95,10 +149,10 @@ export default function CreatePantry({ navigation }) {
 //https://colorhunt.co/palette/1235243e7b2785a947efe3c2
 const styles = StyleSheet.create({
     loadingView: {
-        height:200,
-        width:200,
-        backgroundColor:"white",
-        borderRadius:10
+        height: 200,
+        width: 200,
+        backgroundColor: "white",
+        borderRadius: 10
     },
     pageBackground: {
         backgroundColor: "#123524",
