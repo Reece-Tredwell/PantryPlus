@@ -1,10 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Button, ScrollView, Text, Image } from 'react-native';
+import { StyleSheet, View, Button, ScrollView, Text, Image, Pressable, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Octicons from '@expo/vector-icons/Octicons';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 
-
+//This is a custom component for displaying a product
 function ProductCard({ product }) {
   const isRemoteImage = typeof product.image === 'string' && product.image.startsWith('http');
 
@@ -29,6 +31,10 @@ export default function HomeScreen({ navigation, route }) {
 
   const NavigateToDeletePage = () => {
     navigation.navigate('Delete', { "PantryID": PantryID });
+  };
+
+  const NavigateToProfilePage = () => {
+    navigation.navigate('Profile', { "PantryID": PantryID });
   };
 
 
@@ -106,12 +112,18 @@ export default function HomeScreen({ navigation, route }) {
       </View>
 
       <View style={styles.footer}>
-        <View style={styles.buttonsLeft}>
-          <Button title="Add" style={styles.button} onPress={NavigateToAddPage} />
-        </View>
-        <View style={styles.buttonsRight}>
-          <Button title="Remove" style={styles.button} onPress={NavigateToDeletePage} />
-        </View>
+        <TouchableOpacity style={styles.footerIcon}>
+          <AntDesign name="search1" size={24} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerIcon} onPress={NavigateToDeletePage}>
+          <AntDesign name="delete" size={24} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerIcon} onPress={NavigateToAddPage}>
+          <Octicons name="diff-added" size={24} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerIcon} onPress={NavigateToProfilePage}>
+          <AntDesign name="user" size={24} color="black" />
+        </TouchableOpacity>
       </View>
       <StatusBar style="auto" />
     </View >
@@ -128,7 +140,7 @@ const styles = StyleSheet.create({
   },
   gridContainer: {
     borderRadius: '1%',
-    backgroundColor:"#EFE3C2",
+    backgroundColor: "#EFE3C2",
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
@@ -157,7 +169,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: 'bold',
     color: '#EFE3C2',
-    top: 40
+    top: 20
   },
   pageHeader: {
     justifyContent: 'center',
@@ -172,50 +184,6 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: "center",
     alignItems: "center",
-  },
-  tableHeader: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "#f0f0f0",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    width: "95%",
-    alignSelf: 'center',
-    backgroundColor: "#EFE3C2",
-    top: '5%'
-  },
-  headerCell: {
-    flex: 1,
-    textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 16,
-    color: "#333",
-  },
-  row: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingVertical: 8,
-    marginTop: 10,
-  },
-
-  cell: {
-    fontSize: 11,
-    flex: 1,
-    textAlign: "center",
-    paddingHorizontal: 8,
-  },
-
-  Main: {
-    flexDirection: "row",
-    height: '60%',
-    width: '95%',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    marginBottom: '50%',
-    backgroundColor: "#EFE3C2",
-    top: '5%'
   },
 
   button: {
@@ -237,7 +205,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingRight: 75,
   },
-
+  footerIcon:{
+    justifyContent:"center",
+    alignItems: "center", 
+    bottom:10,
+    height:60,
+    width:85
+  },
   footer: {
     bottom: 0,
     height: '10%',
@@ -293,7 +267,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 100,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     borderRadius: 10,
   }
 });

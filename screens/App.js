@@ -11,6 +11,7 @@ import Delete from './Delete';
 import AddScanner from './Add-Scanner';
 import SelectDelete from './Select-Delete'
 import ScanDelete from './Scan-Delete'
+import Profile from './profile'
 
 const Stack = createStackNavigator();
 
@@ -26,6 +27,7 @@ export default function App() {
         <Stack.Screen name="Add-Scanner" component={AddScanner} options={{ title: "Scan Away!" }} />
         <Stack.Screen name="Select-Delete" component={SelectDelete} options={{ title: "Delete Items" }} />
         <Stack.Screen name="Scan-Delete" component={ScanDelete} options={{ title: "Delete Items By Scanning" }} />
+        <Stack.Screen name="Profile" component={Profile} options={{ title: "Profile" }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

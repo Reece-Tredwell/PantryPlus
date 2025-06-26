@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, Keyboard } from 'react-native';
 import config from 'D:\\PersonalProjects\\PantryPlus\\config.json';
 import React, { useState } from 'react';
-import { Button, DataTable, Title } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { navigate } from 'expo-router/build/global-state/routing';
 
 
@@ -9,7 +9,6 @@ export default function CreatePantry({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [PantryUserName, UsernameSetText] = useState('');
     const [Password, PasswordSetText] = useState('');
-
 
     const ForgotPassword = () => {
         //TODO
@@ -21,6 +20,8 @@ export default function CreatePantry({ navigation }) {
 
     const NavigateToHomePage = (DBID) => {
         navigation.navigate('Home', { "PantryID": DBID })
+        isLoading = false
+        console.log(isLoading)
     };
 
     const isEmailValid = (email) => {
@@ -75,8 +76,11 @@ export default function CreatePantry({ navigation }) {
                     <TextInput style={styles.textInput} secureTextEntry={true} placeholder='Password' placeholderTextColor="#EFE3C2" value={Password} onChangeText={PasswordSetText}></TextInput>
                 </View>
                 <Button title="Forgot Password?" style={styles.ForgotPasswordText} onPress={() => ForgotPassword()}>Forgot Password?</Button>
+
                 {isLoading ? (
-                    <ActivityIndicator size="large" color="#85A947" />
+                        <TouchableOpacity style={styles.LoginButtonBoxLoading} onPress={() => LoginToPantry(PantryUserName, Password)} disabled={true}>
+                            <Text style={styles.LoginText}>Login</Text>
+                        </TouchableOpacity>
                 ) : (
                     <TouchableOpacity style={styles.LoginButtonBox} onPress={() => LoginToPantry(PantryUserName, Password)}>
                         <Text style={styles.LoginText}>Login</Text>
@@ -90,6 +94,12 @@ export default function CreatePantry({ navigation }) {
 
 //https://colorhunt.co/palette/1235243e7b2785a947efe3c2
 const styles = StyleSheet.create({
+    loadingView: {
+        height:200,
+        width:200,
+        backgroundColor:"white",
+        borderRadius:10
+    },
     pageBackground: {
         backgroundColor: "#123524",
         width: '100%',
@@ -142,6 +152,19 @@ const styles = StyleSheet.create({
         width: "90%",
         backgroundColor: '#3E7B27',
         borderColor: '#EFE3C2',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    LoginButtonBoxLoading: {
+        top: '5%',
+        height: '40%',
+        width: "90%",
+        backgroundColor: '#EFE3C2',
+        opacity: 0.3,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         borderBottomLeftRadius: 20,
