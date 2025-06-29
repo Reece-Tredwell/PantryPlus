@@ -23,7 +23,6 @@ export default function CreatePantry({ navigation }) {
     const NavigateToHomePage = (DBID) => {
         navigation.navigate('Home', { "PantryID": DBID, "Data": Data })
         setIsLoading(false)
-        console.log(isLoading)
     };
 
     const isEmailValid = (email) => {

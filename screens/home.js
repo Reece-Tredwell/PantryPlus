@@ -31,7 +31,7 @@ export default function HomeScreen({ navigation, route }) {
   };
 
   const NavigateToDeletePage = () => {
-    navigation.navigate('Delete', { "PantryID": PantryID });
+    navigation.navigate('Scan-Delete', { "PantryID": PantryID });
   };
 
   const NavigateToProfilePage = async () => {
