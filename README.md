@@ -6,9 +6,6 @@ This mobile app, removes the need for a physical shopping list, as it allows for
 
 Users can see their pantry on any device by signing in to their account to see exactly what they have at home.
 
-Pantry Plus has been built using the javascript framework, React Native Expo, this is a technology that allows the development of cross-platform applications.
----
-
 ## ✨ Features
 - Virtual Pantry: Maintain a real-time, digital inventory of everything in your pantry.
 
